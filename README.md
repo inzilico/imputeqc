@@ -9,11 +9,13 @@ Ho to install a package from GitHub
 1. Make sure you have [devtools](https://github.com/r-lib/devtools) package installed. Run from R
 
     install.packages("devtools")
-  
+
 2. Load the `devtools` package and install `imputeqc` from GitHub
 
-    library("devtools")
-    install.github("inzilico/imputeqc")
+```
+library("devtools")
+install.github("inzilico/imputeqc")
+```
 
 How to use a package
 --------------------
