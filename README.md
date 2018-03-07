@@ -8,9 +8,11 @@ Ho to install a package from GitHub
 
 1. Make sure you have [devtools](https://github.com/r-lib/devtools) package installed. Run from R
 
-    install.packages("devtools")
+```
+install.packages("devtools")
+```
 
-2. Load the `devtools` package and install `imputeqc` from GitHub
+2. Load the `devtools` package and install `imputeqc`
 
 ```
 library("devtools")
@@ -20,7 +22,10 @@ install.github("inzilico/imputeqc")
 How to use a package
 --------------------
 
-Check a vignette. Install the package and run in R 
+Read a vignette [How to Select the Number of Clusters for fastPHASE](https://github.com/inzilico/imputeqc/blob/master/vignettes/k_selection.Rmd). 
+
+
+Install the package and run in R 
 
     browseVignettes("imputeqc")
 

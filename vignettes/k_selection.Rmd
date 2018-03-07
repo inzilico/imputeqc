@@ -6,7 +6,7 @@ output:
       rmarkdown::html_vignette:
         fig_caption: yes
 vignette: >
-  %\VignetteIndexEntry{Workflow to Select the Best Number of Clusters for fastPHASE}
+  %\VignetteIndexEntry{How to Select the Number of Clusters for fastPHASE}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,37 +21,35 @@ knitr::opts_chunk$set(
 Motivation
 -----------
 
-Assume you have a Plink files and you dicided to impute the missing genotypes with fastPHASE tool. The number of haplotype clusters (K) is required. One option is to leave the default value of 15. For most cases it will probably work. But what if you have several population in one file because you want to find out the fingerprints of selection with hapFLK tool that utilizes the fastPHASE algorithm?
+Assume you have a Plink files and dicided to impute the missing genotypes with fastPHASE tool. The number of haplotype clusters (K) is required as an argument. One option is to leave the default value of 15. For the most cases it will probably work. But what if you have several populations in one file? Say, you search for the fingerprints of selection with hapFLK tool which utilizes the fastPHASE algorithm.
 
-How many clusters to choose for 4, 6, 8 or even more populations in a pool? A quick tests revealed that K influences the results of hapFLK output. If fastPHASE had an option to estimate the error of imputation, the life would be easire. We could apply the masked analysis. 
+How many clusters to choose for 4, 6, 8 or even more populations in a pool? Tests revealed that K influences the results of hapFLK output. If fastPHASE had an option to estimate the error of imputation, the life would be easire. We could apply the masked analysis. 
 
-The idea of the analysis is quite simple. Mask some genotypes, impute them, then count the error of imputation. Repeat the trick several times with different K and choose the parameter with minimum error of imputation.      
+The idea of the analysis is as follow. Hide some genotypes, impute them, then count the error of imputation. Repeat the trick several times with different K and choose that one corresponding to the minimal error of imputation.      
 
-Below is the implementation of the masked analysis on the base of `imputeqc` R package. Let's start from a list of 4 main steps.
+Below is the implementation of the masked analysis on the base of `imputeqc` R package. Let's list 4 main steps and then consider them a little bit closer.
 
 Workflow to select the best K
 ------------------------------
 
-1. Prepare \*.inp file in the fastPHASE format. Use a Plink tool. Check that alleles are coded as letters or numbers. The missing ones should be `?`. 
+1. Convert Plink files to fastPHASE \*.inp files, using Plink tool. Check that alleles are coded as letters or numbers. The missing ones should be `?`. 
 
-If your data look differently, send me a chunk of them. I'll figure what to do next.   
+If your data look differently, send me a chunk of them. I'll figure out what to do next.   
 
-2. Generate a few test files with an R script `make_test_files.R`. It is enclosed to the package. I think five files are enough to start. 
+2. Generate a few test files with an R script `make_test_files.R` which is enclosed to the package. I think five test files are enough to start with. 
 
 3. Impute the missing genotypes in each test file with fastPHASE. Apply different K for each set of files. 
-
-This step takes a lot of computational time depending on the number of populations under consideration, the number markers, and, of course, the K.    
 
 4. Estimate the imputation quality with `EstimateQuality()` function and chose the K that minimizes the imputation error. 
 
 How to convert Plink files to fastPHASE
 ---------------------------------------
 
-Assume you have in the current directory `chr22.{ped, map}` files. Run in command line
+Assume you have `chr1.{ped, map}` files in the current directory. Run from the command line
 
-    plink --file chr22 --recode fastphase-1chr --out chr22
+    plink --file chr1 --recode fastphase-1chr --out chr1
     
-It will create `chr22.recode.phase.inp` ready for further further manipulations. 
+It will create `chr1.recode.phase.inp` ready for further manipulations. 
 
 The usage of make\_test\_files.R
 ---------------------------------
@@ -112,7 +110,7 @@ There are some flags I advice to apply:
 
 I recommend to save the results of imputation in different folders for different K (`/k10`, `/k15`, etc. )
 
-An example of command for imputation:
+An example of command for imputation with K = 10:
 
     for i in $(seq 1 5); do fastPHASE -T10 -C25 -K10 -H-1 -n -Z -ok10/chr1.m$i masked/chr1.m$i.inp; done
 
@@ -120,27 +118,28 @@ We assume 5 test files (`chr1.m{1:5}.inp`) being in folder `/masked`.
 
 The code will produce 5 `chr1.m{1:5}_genotypes.out` files, where `chr1` is your identifier, `m{1:5}` is added by the above command, and `_genotypes.out` is given by fastPHASE tool. The imputed data sets are saved in `/k10` subdirectory.
 
-The above code helps us to agree input/output from different stages.
+The above code helps us to agree input/output from different stages of workflow.
 
-Be aware that imputation is time consuming stage. Upon accomplishing, we can estimate the quality of imputation.
+Be aware this step takes a lot of computational time depending on the number of populations under consideration, the number markers, and, of course, the K. 
+
+Upon accomplishing, we can estimate the quality of imputation.
 
 The usage of EstimateQuality()
 -----------------------------
 
-There are several metrics to estimate the imputation quality of genotypes (Chan et al, 2016). So far I applied the proportion of correctly imputed genotypes. To compute it, use `EstimateQuality()` function. It returns a data frame with three columns: "alleles", "genotypes", and "K". The first two contains the errors, the third one - K (number of clusters).
+There are several metrics to estimate the imputation quality of genotypes (Chan et al, 2016). So far I applied the proportion of correctly imputed genotypes. To compute it, use `EstimateQuality()` function. It returns a data frame with three columns: "alleles", "genotypes", and "K". The first two contains the errors, the third one - K (the number of clusters).
 
 The error is counted as 1 - accuracy, where accuracy is a proportion of correctly imputed genotypes or alleles. By correctly imputed genotype we mean that both alleles coincided with the original ones. The function returns the values for one set of test files.
 
-    # Source functions
-    source("helpers.R")
-
+```
     # Count errors for one set of test files
     errors <- EstimateQuality(origin = "chr1.inp",
                              mask = "masks.RDS", 
                              imputed = imputed,
                              K = 15)
+```
 
-In this code we assume that `chr1.inp` has original genotypes, `masks.RDS` contains the list of all masks (matrices) generated, and `imputed` is a vector with the full paths to `*_genotypes.out` produced by fastPHASE. The order of files in `imputed` is the same as the order of masks applied upstream. All test files were treated with fastPHASE applying K = 15.
+Here we assume that `chr1.inp` has original genotypes, `masks.RDS` contains the list of all masks (matrices) generated above by `make_test_files.R`,  and `imputed` is a vector with the full paths to `*_genotypes.out` produced by fastPHASE. The order of files in `imputed` is the same as the order of masks applied upstream. All test files in a set were treated with fastPHASE applying K = 15.
 
 References
 ----------
