@@ -1,7 +1,8 @@
 #' Estimate the quality of imputation
 #'
 #' \code{EstimateQuality} counts the proportion of correctly imputed alleles and
-#' genotypes.
+#' genotypes. The latter is considered to be correctly imputed if both alleles
+#' coincide.
 #'
 #' @param origin path/to/filename.inp, where \code{filename.inp} is the
 #'   original (unmasked) fastPHASE file
@@ -64,7 +65,7 @@ EstimateQuality <- function(origin, masks, imputed, K){
 
   }
 
-  ldply(out, function(x) x)
+  plyr::ldply(out, function(x) x)
 }
 
 CountStat <- function(a0, a1){
@@ -108,8 +109,8 @@ CountStat <- function(a0, a1){
 seq2mat <- function(vec){
   # Converts sequences into matrix
 
-  tmp <- laply(vec, function(x) strsplit(x, split = ""))
-  tmp <- ldply(tmp, function(x) x)
+  tmp <- plyr::laply(vec, function(x) strsplit(x, split = ""))
+  tmp <- plyr::ldply(tmp, function(x) x)
 
   tmp <- as.matrix(tmp)
   dimnames(tmp) <- NULL

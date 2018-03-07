@@ -12,11 +12,10 @@ Ho to install a package from GitHub
 install.packages("devtools")
 ```
 
-2. Load the `devtools` package and install `imputeqc`
+2. Install `imputeqc`
 
 ```
-library("devtools")
-install_github("inzilico/imputeqc", build_vignettes = TRUE)
+devtools::install_github("inzilico/imputeqc", build_vignettes = TRUE)
 ```
 
 How to use a package
@@ -24,9 +23,13 @@ How to use a package
 
 Read a vignette [How to Select the Number of Clusters for fastPHASE](https://github.com/inzilico/imputeqc/blob/master/vignettes/k_selection.Rmd). 
 
-If you run R on a local machine, the other way to access the vignette: 
+On a local machine, the vignette can be accessed as follow: 
 
     browseVignettes("imputeqc")
+    
+On remote machine, the vignette can be opened in the "Help" tab of RStudio: 
+
+    vignette("k_selection")
 
 Contacts
 --------

@@ -29,5 +29,6 @@ A data frame with three columns: "alleles", "genotypes", and "K". The
 }
 \description{
 \code{EstimateQuality} counts the proportion of correctly imputed alleles and
-genotypes.
+genotypes. The latter is considered to be correctly imputed if both alleles
+coincide.
 }

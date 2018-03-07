@@ -1,7 +1,8 @@
 #' Apply set of masks to sequencies.
 #'
 #' Function applies a set of masks to sequencies. The output is saved as
-#' fastPHASE simpilfied *.inp files.
+#' fastPHASE simpilfied *.inp files. Simplified means that it doesn't include
+#' sample ids.
 #'
 #' @param g Character vector with sequences
 #' @param masks List of masks as binary matrices
@@ -24,7 +25,7 @@ ApplyMasks <- function(g, masks, pref) {
   for (n in seq_along(masks)) {
 
     # Get indexes of masked genotypes
-    ind <- alply(masks[[n]], 1, function(v) which(v == 1))
+    ind <- plyr::alply(masks[[n]], 1, function(v) which(v == 1))
 
     # Replicate indexes
     ind <- rep(ind, each = 2)
@@ -32,7 +33,7 @@ ApplyMasks <- function(g, masks, pref) {
     message(sprintf("Applying mask %s...", n))
 
     # Lopp throug all sequences and mask them
-    gm <- llply(seq_len(N), .progress = create_progress_bar(name = "text"),
+    gm <- plyr::llply(seq_len(N), .progress = create_progress_bar(name = "text"),
                 function(i, g, ind) MaskSequence(g[i], ind[[i]]), g = g, ind = ind)
 
     # Set output filename
@@ -45,7 +46,7 @@ ApplyMasks <- function(g, masks, pref) {
     write(c(N/2, M), file = fn, ncolumns = 1)
 
     # Write masked sequences to file
-    l_ply(gm, write, file = fn, append = T)
+    plyr::l_ply(gm, write, file = fn, append = T)
 
     message(sprintf("File %s is saved", fn))
   }

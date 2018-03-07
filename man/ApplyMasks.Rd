@@ -21,5 +21,6 @@ No values
 }
 \description{
 Function applies a set of masks to sequencies. The output is saved as
-fastPHASE simpilfied *.inp files.
+fastPHASE simpilfied *.inp files. Simplified means that it doesn't include
+sample ids.
 }

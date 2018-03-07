@@ -21,9 +21,9 @@ knitr::opts_chunk$set(
 Motivation
 -----------
 
-Assume you have a Plink files and dicided to impute the missing genotypes with fastPHASE tool. The number of haplotype clusters (K) is required as an argument. One option is to leave the default value of 15. For the most cases it will probably work. But what if you have several populations in one file? Say, you search for the fingerprints of selection with hapFLK tool which utilizes the fastPHASE algorithm.
+Assume you have a Plink files and decided to impute the missing genotypes with fastPHASE tool. The number of haplotype clusters (K) is required as an argument. One option is to leave the default value of 15. For the most cases it will probably work. But what if you have several populations in one file? Say, you search for the fingerprints of selection with hapFLK tool which utilizes the fastPHASE algorithm.
 
-How many clusters to choose for 4, 6, 8 or even more populations in a pool? Tests revealed that K influences the results of hapFLK output. If fastPHASE had an option to estimate the error of imputation, the life would be easire. We could apply the masked analysis. 
+How many clusters to choose for 4, 6, 8 or even more populations in a pool? Tests revealed that K influences the results of hapFLK output. If fastPHASE had an option to estimate the error of imputation, the life would be easier. We could apply the masked analysis. 
 
 The idea of the analysis is as follow. Hide some genotypes, impute them, then count the error of imputation. Repeat the trick several times with different K and choose that one corresponding to the minimal error of imputation.      
 
