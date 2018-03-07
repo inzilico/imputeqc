@@ -23,7 +23,7 @@ main <- function(){
   )
 
   # Create parser
-  parser <- OptionParser(usage = "%prog + [options] input",
+  parser <- OptionParser(usage = "%prog [options] input",
                          option_list = option.list,
                          prog = "make_test_files.R",
                          description = "\ninput: full/path/to/filename.inp, where \"filename.inp\" is fastPHASE input file")
