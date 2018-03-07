@@ -1,0 +1,20 @@
+Package: imputeqc
+Type: Package
+Title: A Quality Control for Genotype Imputation 
+Version: 0.99.0
+Author: Gennady Khvorykh
+Maintainer: Gennady Khvorykh <info@inzilico.com>
+Description: Estimate the quality of imputation of genotypes with fastPHASE tool
+    by masked analysis and find the optimal number of clusters 
+    for hapFLK test.  
+Depends: R (>= 3.4.2)
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: plyr
+Suggests: 
+    optparse,
+    knitr,
+    rmarkdown
+RoxygenNote: 6.0.1
+VignetteBuilder: knitr
