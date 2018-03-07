@@ -13,6 +13,7 @@
 #'
 #' @return No values
 #' @export
+#' @importFrom plyr progress_text
 #'
 #' @examples
 ApplyMasks <- function(g, masks, pref) {
