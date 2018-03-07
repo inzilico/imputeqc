@@ -33,7 +33,7 @@ ApplyMasks <- function(g, masks, pref) {
     message(sprintf("Applying mask %s...", n))
 
     # Lopp throug all sequences and mask them
-    gm <- plyr::llply(seq_len(N), .progress = create_progress_bar(name = "text"),
+    gm <- plyr::llply(seq_len(N), .progress = plyr::create_progress_bar(name = "text"),
                 function(i, g, ind) MaskSequence(g[i], ind[[i]]), g = g, ind = ind)
 
     # Set output filename
