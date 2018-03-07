@@ -5,6 +5,7 @@
 # imputation.
 # Author: Gennady Khvorykh, http://inZilico.com
 
+library(imputeqc)
 suppressPackageStartupMessages(library("optparse"))
 
 main <- function(){
