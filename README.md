@@ -1,7 +1,7 @@
 What is `imputeqc` for
 ----------------------
 
-`imputeqc` is an R package and accompanied scripts to estimate the quality of imputation of genotypes that was made with [fastPHASE](http://scheet.org/software.html) tool. It allows to choose the appropriate number of haplotype clusters (K) for the search of selection fingeprints with the use of [hapFLK](https://forge-dga.jouy.inra.fr/projects/hapflk) test.   
+`imputeqc` is an R package and accompanied scripts to estimate the quality of imputation of genotypes that was made with [fastPHASE](http://scheet.org/software.html) tool. It allows to choose the appropriate number of haplotype clusters (K) for the search of selection fingerprints with [hapFLK](https://forge-dga.jouy.inra.fr/projects/hapflk) test.   
 
 Ho to install a package from GitHub
 -----------------------------------
@@ -27,7 +27,7 @@ On a local machine, the vignette can be accessed as follow:
 
     browseVignettes("imputeqc")
     
-On remote machine, the vignette can be opened in the "Help" tab of RStudio: 
+On remote machine, the vignette can be opened in the "Help" tab of RStudio:
 
     vignette("k_selection")
 
