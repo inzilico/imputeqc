@@ -1,10 +1,10 @@
-What is `imputeqc` for
-----------------------
+What is it for
+--------------
 
-`imputeqc` is an R package and accompanied scripts to estimate the quality of imputation of genotypes that was made with [fastPHASE](http://scheet.org/software.html) tool. It allows to choose the appropriate number of haplotype clusters (K) for the search of selection fingerprints with [hapFLK](https://forge-dga.jouy.inra.fr/projects/hapflk) test.   
+*imputeqc* is an R package and accompanied scripts to estimate the quality of imputation of genotypes that was made with [fastPHASE](http://scheet.org/software.html) tool. It allows to choose the appropriate number of haplotype clusters (K) for the search of selection fingerprints with [hapFLK](https://forge-dga.jouy.inra.fr/projects/hapflk) test.   
 
-Ho to install a package from GitHub
------------------------------------
+Ho to install from GitHub
+--------------------------
 
 1. Make sure you have [devtools](https://github.com/r-lib/devtools) package installed. Run from R
 
@@ -18,8 +18,8 @@ install.packages("devtools")
 devtools::install_github("inzilico/imputeqc", build_vignettes = TRUE)
 ```
 
-How to use a package
---------------------
+How to use
+----------
 
 Read a vignette [How to Select the Number of Clusters for fastPHASE](https://github.com/inzilico/imputeqc/blob/master/vignettes/k_selection.Rmd). 
 
