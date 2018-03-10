@@ -32,6 +32,9 @@ browseVignettes("imputeqc")
 ```
 vignette("k_selection")
 ```
+Citing
+------
+Gennady Khvorykh. inzilico/imputeqc v1.0.0 (2018). GitHub repository, https://github.com/inzilico/imputeqc.
 
 Contacts
 --------

@@ -160,12 +160,10 @@ References
 
 Citing
 ------
-
-Gennady Khvorykh. inzilico/kselection v1.0. (2017). GitHub repository, https://github.com/inzilico/kselection. doi:10.5281/zenodo.1173276
+Gennady Khvorykh. inzilico/imputeqc v1.0.0 (2018). GitHub repository, https://github.com/inzilico/imputeqc.
 
 Author
 ------
-
 Gennady Khvorykh, a bioinformatician, [inzilico.com](http://inzilico.com)
 
 Suggestions, questions, and comments are open! Feel free [to drop me the message](http://www.inzilico.com/contacts/).
