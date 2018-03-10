@@ -1,7 +1,7 @@
 Package: imputeqc
 Type: Package
 Title: A Quality Control for Genotype Imputation 
-Version: 0.99.0
+Version: 1.00.0
 Author: Gennady Khvorykh
 Maintainer: Gennady Khvorykh <info@inzilico.com>
 Description: Estimate the quality of imputation of genotypes with fastPHASE tool
