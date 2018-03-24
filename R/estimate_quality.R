@@ -1,28 +1,30 @@
 #' Estimate the quality of imputation
 #'
-#' \code{EstimateQuality} counts the proportion of correctly imputed alleles and
-#' genotypes. The latter is considered to be correctly imputed if both alleles
-#' coincide.
+#' \code{EstimateQuality} estimates the error of allele and genotype imputation.
 #'
-#' @param origin path/to/filename.inp, where \code{filename.inp} is the
-#'   original (unmasked) fastPHASE file
+#' @param origin path/to/filename.inp, where \code{filename.inp} is the original
+#'   (unmasked) fastPHASE file
 #' @param masks path/to/masks.RDS, where \code{masks.RDS} keeps the masks
-#'   created upstream with \code{\link{GenerateMaskSet}} and saved as \code{*.RDS}.
-#' @param imputed vector of \code{path/to/*_genotypes.out}. The files
-#'   have genotypes imputed with fastPHASE. They should be in the same
-#'   order as masks were generated.
-#' @param K The number of clusters in the hapFLK test
+#'   created upstream with \code{\link{GenerateMaskSet}} and saved as
+#'   \code{*.RDS}.
+#' @param imputed vector of \code{path/to/*_genotypes.out}. The files have
+#'   genotypes imputed with fastPHASE. They should be in the same order as masks
+#'   were generated.
+#' @param id character, id of computational experiment. In case you run several
+#'   calculations with different model parameter to find the best one, you can
+#'   mark each run with id for the convinience of further visualization. The
+#'   argument is optional.
 #'
-#' @return A data frame with three columns: "alleles", "genotypes", and "K". The
-#'   first two contains the errors, the third one - \code{K} (the number of
-#'   clusters). The error is counted as \code{1 - accuracy}, where
+#' @return A data frame with three columns: "alleles", "genotypes", and "id" if
+#'   provided. The first two contains the errors, the third one - id of the
+#'   experiment. The error is counted as \code{(1 - accuracy)}, where
 #'   \code{accuracy} is a proportion of correctly imputed genotypes and alleles.
 #'   By correctly imputed genotype we mean that both alleles coincided with the
 #'   original ones. The function returns the values for one set of test files.
 #' @export
 #'
 #' @examples
-EstimateQuality <- function(origin, masks, imputed, K){
+EstimateQuality <- function(origin, masks, imputed, id = NULL){
 
   # Load original data set
   g0 <- ReadFastPHASE(origin)
@@ -61,7 +63,8 @@ EstimateQuality <- function(origin, masks, imputed, K){
     d1 <- c1[m1]
 
     # Count statistics
-    out[[i]] <- c(CountStat(d0, d1), K = K)
+    if(is.null(id)) { out[[i]] <- CountStat(d0, d1)
+    } else { out[[i]] <- c(CountStat(d0, d1), id = id) }
 
   }
 

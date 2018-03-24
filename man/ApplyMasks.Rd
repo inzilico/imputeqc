@@ -12,7 +12,7 @@ ApplyMasks(g, masks, pref)
 \item{masks}{List of masks as binary matrices}
 
 \item{pref}{path/to/prefix to save the result. The number of files created
-equals to the length of masks variable. The filenames are generated
+equals to the length of masks. The filenames are generated
 automatically like this: \code{prefix.m{n}.inp}, where \code{prefix} is a user defined
 string, \code{n} is an ordinal number of the mask.}
 }
@@ -20,7 +20,7 @@ string, \code{n} is an ordinal number of the mask.}
 No values
 }
 \description{
-Function applies a set of masks to sequencies. The output is saved as
+Function applies a set of masks to strings obtained with readFastPhase. The output is saved as
 fastPHASE simpilfied *.inp files. Simplified means that it doesn't include
-sample ids.
+sample ids. The files created are ready for imputation with fastPHASE.
 }

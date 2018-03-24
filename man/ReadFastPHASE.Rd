@@ -14,8 +14,7 @@ A character vector with strings representing the genotypes. Two
  sequencies per individual.
 }
 \description{
-\code{ReadfastPHASE} parses fastPHASE *.inp files. There are two types of
-them: with ids of samples provided or not. The function loads both types. What
-important is the coding of alleles. They can be letters or
-numbers, but missing ones should be coded as "?".
+\code{ReadfastPHASE} parses fastPHASE *.inp files. There are two types of 
+them: with ids of samples provided or not. The function loads both types. The
+alleles can be coded as letters or numbers, but missing ones should be "?".
 }
