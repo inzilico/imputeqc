@@ -10,7 +10,7 @@
 #' @param imputed vector of \code{path/to/*_genotypes.out}. The files have
 #'   genotypes imputed with fastPHASE. They should be in the same order as masks
 #'   were generated.
-#' @param id character, id of computational experiment. In case you run several
+#' @param id character or numeric, id of computational experiment. In case you run several
 #'   calculations with different model parameter to find the best one, you can
 #'   mark each run with id for the convinience of further visualization. The
 #'   argument is optional.

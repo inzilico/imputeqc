@@ -18,7 +18,7 @@ created upstream with \code{\link{GenerateMaskSet}} and saved as
 genotypes imputed with fastPHASE. They should be in the same order as masks
 were generated.}
 
-\item{id}{character, id of computational experiment. In case you run several
+\item{id}{character or numeric, id of computational experiment. In case you run several
 calculations with different model parameter to find the best one, you can
 mark each run with id for the convinience of further visualization. The
 argument is optional.}
