@@ -1,12 +1,12 @@
 #'Read fastPHASE files
 #'
-#'\code{ReadfastPHASE} parses fastPHASE *.inp files. There are two types of 
-#'them: with ids of samples provided or not. The function loads both types. The
-#'alleles can be coded as letters or numbers, but missing ones should be "?".
+#'Parses fastPHASE *.inp files. There are two types of them: with ids of samples
+#'provided or not. The function loads both types. The alleles can be coded as
+#'letters or numbers, but missing ones should be "?".
 #'
 #'@param inp path/to/filename.inp
-#'@return A character vector with strings representing the genotypes. Two
-#'  sequencies per individual.
+#'@return A character vector with strings of letters representing haplotypes.
+#'  The length of vector is 2N, where N is the number of diploid individuals.
 #'@export
 ReadFastPHASE <- function(inp){
   # Check input

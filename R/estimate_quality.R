@@ -1,6 +1,6 @@
 #' Estimate the quality of imputation
 #'
-#' \code{EstimateQuality} estimates the error of allele and genotype imputation.
+#' Estimates the error of allele and genotype imputation.
 #'
 #' @param origin path/to/filename.inp, where \code{filename.inp} is the original
 #'   (unmasked) fastPHASE file
@@ -10,10 +10,10 @@
 #' @param imputed vector of \code{path/to/*_genotypes.out}. The files have
 #'   genotypes imputed with fastPHASE. They should be in the same order as masks
 #'   were generated.
-#' @param id character or numeric, id of computational experiment. In case you run several
-#'   calculations with different model parameter to find the best one, you can
-#'   mark each run with id for the convinience of further visualization. The
-#'   argument is optional.
+#' @param id character or numeric, id of computational experiment. In case you
+#'   run several calculations with different model parameter to find the best
+#'   one, you can mark each run with id for the convinience of further
+#'   visualization. The argument is optional.
 #'
 #' @return A data frame with three columns: "alleles", "genotypes", and "id" if
 #'   provided. The first two contains the errors, the third one - id of the

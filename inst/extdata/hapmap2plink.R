@@ -4,11 +4,13 @@
 ## Usage: Rscript hapmap2plink.R filename.txt.gz
 ## Author: Gennady Khvorykh, inzilico.com
 
-args <- commandArgs(TRUE)
+isBiallelic <- function(x) {
+  tmp <- unlist(strsplit(x, split = ""))
+  tmp <- tmp[tmp != 0]
+  length(unique(tmp)) <= 2
+}
 
-# TODO: remove after debug
-# args <- vector("character")
-# args[1] <- "~/data/hapmap/phaseI/genotypes_chr22_CEU.txt.gz"
+args <- commandArgs(TRUE)
 
 # Check input
 if(is.na(args[1]))
@@ -45,10 +47,6 @@ map <- cbind(map, 0)
 
 chrom <- unique(map[, 1])
 message("Chromosome: ", chrom)
-message("SNPs: ", nrow(map))
-
-# Save map
-write.table(map[, c(1, 2, 5, 3)], paste0(fn, ".map"), col.names = F, row.names = F, quote = F)
 
 # Create ped data
 ped <- data[, -c(1:5)]
@@ -59,18 +57,22 @@ ped <- ped[-1, ]
 ped <- ped[ind, ]
 ped <- t(ped)
 
-# Split the alleles and replace N by 0 (missing allele)
-tmp <- apply(ped, 2, function(x) {
-  t <- strsplit(x, "")
-  lapply(t, gsub, pattern = "N", replacement = "0")
-  })
-tmp <- sapply(tmp, do.call, what = "rbind", simplify = F)
-ped <- do.call(cbind, tmp)
+# Replace any letter except A, T, C, G by 0 (missing allele)
+ped <- apply(ped, 2, gsub, pattern = "[^ATCG]", replacement = "0")
 
-# Finilize ped creation
+# Leave only biallelic sites
+biallelic <- apply(ped, 2, isBiallelic)
+map <- map[biallelic, ]
+ped <- ped[, biallelic]
+
+if (sum(!biallelic) > 0) message("Non biallelic: ", sum(!biallelic))
+message("SNPs: ", nrow(map))
+
+#  Accomplish the creation of ped
 ped <- cbind(0, ids, 0, 0, 0, -9, ped)
 
-# Save ped
+# Save ped/map
+write.table(map[, c(1, 2, 5, 3)], paste0(fn, ".map"), col.names = F, row.names = F, quote = F)
 write.table(ped, paste0(fn, ".ped"), col.names = F, row.names = F, quote = F)
 
 message("All done!")

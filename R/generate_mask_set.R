@@ -112,7 +112,7 @@ GetMissing <- function(data, M){
 
   # Print proportion of missing genotypes
   p <- sum(colSums(m))/(dim(m)[1] * dim(m)[2])
-  message("Proportion of missing genotype: ", round(p, 4))
+  message("Proportion of originally missing genotype: ", round(p, 4))
 
   m
 }

@@ -1,14 +1,14 @@
 #' Apply set of masks to sequencies.
 #'
-#' Function applies a set of masks to strings obtained with readFastPhase. The output is saved as
-#' fastPHASE simpilfied *.inp files. Simplified means that it doesn't include
-#' sample ids. The files created are ready for imputation with fastPHASE.
+#' Applies a set of masks to strings obtained with readFastPhase. The output is
+#' saved as fastPHASE *.inp file not including sample ids. It is ready for
+#' imputation with fastPHASE.
 #'
 #' @param g Character vector with sequences
 #' @param masks List of masks as binary matrices
 #' @param pref path/to/prefix to save the result. The number of files created
-#'   equals to the length of masks. The filenames are generated
-#'   automatically like this: \code{prefix.m{n}.inp}, where \code{prefix} is a user defined
+#'   equals to the length of masks. The filenames are generated automatically
+#'   like this: \code{prefix.m{n}.inp}, where \code{prefix} is a user defined
 #'   string, \code{n} is an ordinal number of the mask.
 #'
 #' @return No values
