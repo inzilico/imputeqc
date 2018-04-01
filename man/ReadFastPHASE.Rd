@@ -10,11 +10,11 @@ ReadFastPHASE(inp)
 \item{inp}{path/to/filename.inp}
 }
 \value{
-A character vector with strings representing the genotypes. Two
- sequencies per individual.
+A character vector with strings of letters representing haplotypes.
+ The length of vector is 2N, where N is the number of diploid individuals.
 }
 \description{
-\code{ReadfastPHASE} parses fastPHASE *.inp files. There are two types of 
-them: with ids of samples provided or not. The function loads both types. The
-alleles can be coded as letters or numbers, but missing ones should be "?".
+Parses fastPHASE *.inp files. There are two types of them: with ids of samples
+provided or not. The function loads both types. The alleles can be coded as
+letters or numbers, but missing ones should be "?".
 }

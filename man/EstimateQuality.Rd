@@ -18,10 +18,10 @@ created upstream with \code{\link{GenerateMaskSet}} and saved as
 genotypes imputed with fastPHASE. They should be in the same order as masks
 were generated.}
 
-\item{id}{character or numeric, id of computational experiment. In case you run several
-calculations with different model parameter to find the best one, you can
-mark each run with id for the convinience of further visualization. The
-argument is optional.}
+\item{id}{character or numeric, id of computational experiment. In case you
+run several calculations with different model parameter to find the best
+one, you can mark each run with id for the convinience of further
+visualization. The argument is optional.}
 }
 \value{
 A data frame with three columns: "alleles", "genotypes", and "id" if
@@ -32,5 +32,5 @@ A data frame with three columns: "alleles", "genotypes", and "id" if
   original ones. The function returns the values for one set of test files.
 }
 \description{
-\code{EstimateQuality} estimates the error of allele and genotype imputation.
+Estimates the error of allele and genotype imputation.
 }

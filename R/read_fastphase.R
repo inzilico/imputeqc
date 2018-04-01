@@ -21,8 +21,8 @@ if(file.access(inp) == -1) stop(inp, " doesn't exist!", call. = F)
   l <- l[nchar(l) == nchar(l[length(l)])]
 
   # Print info about dataset
-  message("Sequences: ", length(l))
-  message("Markers: ", nchar(l[1]))
+  message("Haplotypes: ", length(l))
+  message("SNPs: ", nchar(l[1]))
 
   return(l)
 }
