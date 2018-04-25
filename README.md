@@ -1,5 +1,5 @@
-What is it for
---------------
+What is it
+----------
 
 *imputeqc* is an R package and accompanied scripts to estimate the quality of imputation of genotypes that was made with [fastPHASE](http://scheet.org/software.html) and [BEAGLE](https://faculty.washington.edu/browning/beagle/beagle.html) softwares. Any other tools that support *.inp fastPHASE or VCF files can be also considered. The package is based on masked data analysis. 
 
@@ -32,7 +32,7 @@ devtools::install_github("inzilico/imputeqc", build_vignettes = TRUE)
 How to use
 ----------
 
-Read a vignette [How to Select the Number of Clusters for fastPHASE](https://htmlpreview.github.io/?https://github.com/inzilico/imputeqc/blob/master/vignettes/k_selection.html). 
+Read a vignette [How to Select the Number of Clusters for fastPHASE](https://htmlpreview.github.io/?https://github.com/inzilico/imputeqc/blob/master/inst/doc/k_selection.html). 
 
 * On a local machine, the vignette can be accessed as follow: 
 ```
