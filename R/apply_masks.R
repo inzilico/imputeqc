@@ -1,17 +1,17 @@
-#' Apply set of masks to sequencies.
+#' Apply set of masks to haplotypes.
 #'
-#' Applies a set of masks to strings (haplotypes) obtained with readFastPhase.
-#' The output is saved as fastPHASE *.inp file not including sample ids. It is
-#' ready for imputation with fastPHASE.
+#' Applies a set of masks to haplotypes obtained with readFastPhase. The output
+#' is saved as fastPHASE *.inp file not including sample ids (a simplified
+#' version of fastPHASE files). It is ready for imputation with fastPHASE.
 #'
-#' @param g Character vector with original (notmasked) haplotypes
+#' @param g Character vector with original (unmasked) haplotypes
 #' @param masks List of masks as binary matrices
-#' @param pref path/to/prefix to save the result. The number of files created
-#'   equals to the length of masks. The filenames are generated automatically
-#'   like this: \code{prefix.m{n}.inp}, where \code{prefix} is a user defined
-#'   string, \code{n} is an ordinal number of the mask.
-#' @param vcf VCF-class object. If provided, the output will be saved as vcf. If
-#'   not, as fastPHASE inp file.
+#' @param pref path/to/prefix to save the output. The number of files created
+#'   equals to the length of masks variable. The filenames are generated
+#'   automatically like this: \emph{prefix.m{n}.inp}, where \emph{prefix} is a
+#'   user defined string, \emph{n} is an ordinal number of the mask.
+#' @param vcf VCF-class object. If provided, the output will be saved as vcf
+#'   file. If not, as fastPHASE inp file.
 #'
 #' @return No values
 #' @export
@@ -20,7 +20,7 @@
 ApplyMasks <- function(g, masks, pref, vcf = NULL) {
 
   # Initilize
-  N <- length(g) # Number of haplotypes
+  N <- length(g) # The number of haplotypes
 
   # Loop through all masks and save the masked data obtained
   for (n in seq_along(masks)) {
@@ -47,7 +47,7 @@ ApplyMasks <- function(g, masks, pref, vcf = NULL) {
 }
 
 MaskSequence <- function(sequence, positions, symbol = "?"){
-  # Replace bases in a sequence by `mask` symbol
+  # Replace bases in a sequence by 'symbol' variable
   # Input:
   #   sequence: character string
   #   positions: vector with positions of characters to be replaced by symbol

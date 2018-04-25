@@ -7,11 +7,15 @@
 PlotDiscordance(fname, tl = NULL, stl = NULL, id = NULL, ...)
 }
 \arguments{
-\item{fname}{path to dataframe with two columns 'disc' and 'id'}
+\item{fname}{path to dataframe with two columns 'discordance' and 'id'}
 
 \item{tl}{optional title of the plot}
 
 \item{stl}{optional subtitle of the plot}
+
+\item{id}{optional x-axis label}
+
+\item{...}{other parameters that can be passed to \emph{ggplot2} functions}
 }
 \value{
 ggplot object

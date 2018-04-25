@@ -3,24 +3,23 @@
 #' Counts the discordance of genotypes imputed.
 #'
 #' @param origin path to original unmasked file
-#' @param masks path/to/masks.RDS, where \code{masks.RDS} keeps the masks
-#'   created upstream with \code{\link{GenerateMaskSet}} and saved as
-#'   \code{*.RDS}.
-#' @param imputed vector of paths to files imputed. In the case of fastPHASE
-#'   program the elements are \code{path/to/*_genotypes.out}. In the case of
-#'   BEAGLE - \code{path/to/*.vcf} or \code{path/to/*.vcf.gz}. The order of
-#'   elements of vector and masks should coincide.
-#' @param id character or numeric, id of computational experiment. In case you
-#'   run several calculations with different model parameter to find the best
+#' @param masks path/to/masks.RDS, where \emph{masks.RDS} keeps the masks
+#'   created upstream with \emph{\link{GenerateMaskSet}} and saved as
+#'   \emph{*.RDS}.
+#' @param imputed vector of paths to files imputed. In the case of fastPHASE,
+#'   the elements are \emph{path/to/*_genotypes.out}. In the case of vcf files,
+#'   the elements are \emph{path/to/*.vcf} or \emph{path/to/*.vcf.gz}. The order
+#'   of elements of vector and masks should coincide.
+#' @param id character or numeric, id of computational experiment. If you run
+#'   several calculations with different model parameter to find the optimal
 #'   one, you can mark each run with id for the convinience of further
 #'   visualization. The argument is optional.
 #'
-#' @return A data frame with three columns: "alleles", "genotypes", and "id" if
-#'   provided. The first two contains the errors, the third one - id of the
-#'   experiment. The error is counted as \code{(1 - accuracy)}, where
-#'   \code{accuracy} is a proportion of correctly imputed genotypes and alleles.
-#'   By correctly imputed genotype we mean that both alleles coincided with the
-#'   original ones. The function returns the values for one set of test files.
+#' @return A data frame with two columns: "discordance" and "id". If \emph{id}
+#'   argument is not provided, only "discordance" is returned. It contains a
+#'   proportion of wrognly imputed genotypes. By this we mean that one or two
+#'   alleles are not coincided with the original ones. The function returns the
+#'   values for one set of test files.
 #' @export
 #'
 EstimateQuality <- function(origin, masks, imputed, id = NULL){
@@ -97,9 +96,11 @@ EstimateQuality <- function(origin, masks, imputed, id = NULL){
 #'
 #' Draw boxplots of discordance estimated for different model parameters.
 #'
-#' @param fname path to dataframe with two columns 'disc' and 'id'
+#' @param fname path to dataframe with two columns 'discordance' and 'id'
 #' @param tl optional title of the plot
 #' @param stl optional subtitle of the plot
+#' @param id optional x-axis label
+#' @param ... other parameters that can be passed to \emph{ggplot2} functions
 #'
 #' @return ggplot object
 #' @import ggplot2

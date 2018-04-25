@@ -15,7 +15,7 @@ A character vector with strings of letters representing haplotypes.
 }
 \description{
 Parses fastPHASE *.inp files. There are two types of them: with ids of samples
-provided or not. The function recognizes the both. The alleles can be coded as
+provided or not. The function recognizes both. The alleles can be coded as
 letters or numbers, but missing ones should be always "?". Check that alleles
 in input file are written without whitespaces. The haplotype should look like
 'AACTT' and not like 'A A C T T'.

@@ -2,28 +2,28 @@
 % Please edit documentation in R/apply_masks.R
 \name{ApplyMasks}
 \alias{ApplyMasks}
-\title{Apply set of masks to sequencies.}
+\title{Apply set of masks to haplotypes.}
 \usage{
 ApplyMasks(g, masks, pref, vcf = NULL)
 }
 \arguments{
-\item{g}{Character vector with original (notmasked) haplotypes}
+\item{g}{Character vector with original (unmasked) haplotypes}
 
 \item{masks}{List of masks as binary matrices}
 
-\item{pref}{path/to/prefix to save the result. The number of files created
-equals to the length of masks. The filenames are generated automatically
-like this: \code{prefix.m{n}.inp}, where \code{prefix} is a user defined
-string, \code{n} is an ordinal number of the mask.}
+\item{pref}{path/to/prefix to save the output. The number of files created
+equals to the length of masks variable. The filenames are generated
+automatically like this: \emph{prefix.m{n}.inp}, where \emph{prefix} is a
+user defined string, \emph{n} is an ordinal number of the mask.}
 
-\item{vcf}{VCF-class object. If provided, the output will be saved as vcf. If
-not, as fastPHASE inp file.}
+\item{vcf}{VCF-class object. If provided, the output will be saved as vcf
+file. If not, as fastPHASE inp file.}
 }
 \value{
 No values
 }
 \description{
-Applies a set of masks to strings (haplotypes) obtained with readFastPhase.
-The output is saved as fastPHASE *.inp file not including sample ids. It is
-ready for imputation with fastPHASE.
+Applies a set of masks to haplotypes obtained with readFastPhase. The output
+is saved as fastPHASE *.inp file not including sample ids (a simplified
+version of fastPHASE files). It is ready for imputation with fastPHASE.
 }

@@ -115,7 +115,7 @@ An example of command for imputation with K = 10:
 
 We assume 5 test files (*chr1.m{1:5}.inp*) being in folder */masked*.
 
-The code will produce 5 *chr1.m{1:5}_genotypes.out* files, where *chr1* is your identifier, *m{1:5}* is added by the above command, and *_genotypes.out* is given by fastPHASE. The imputed data sets are saved in */k10* subdirectory.
+The code will produce 5 *chr1.m{1:5}\_genotypes.out* files, where *chr1* is your identifier, *m{1:5}* is added by the above command, and *\_genotypes.out* is given by fastPHASE. The imputed data sets are saved in */k10* subdirectory.
 
 The above code helps us to agree input/output from different stages of workflow.
 

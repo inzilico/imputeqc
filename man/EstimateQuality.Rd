@@ -9,27 +9,26 @@ EstimateQuality(origin, masks, imputed, id = NULL)
 \arguments{
 \item{origin}{path to original unmasked file}
 
-\item{masks}{path/to/masks.RDS, where \code{masks.RDS} keeps the masks
-created upstream with \code{\link{GenerateMaskSet}} and saved as
-\code{*.RDS}.}
+\item{masks}{path/to/masks.RDS, where \emph{masks.RDS} keeps the masks
+created upstream with \emph{\link{GenerateMaskSet}} and saved as
+\emph{*.RDS}.}
 
-\item{imputed}{vector of paths to files imputed. In the case of fastPHASE
-program the elements are \code{path/to/*_genotypes.out}. In the case of
-BEAGLE - \code{path/to/*.vcf} or \code{path/to/*.vcf.gz}. The order of
-elements of vector and masks should coincide.}
+\item{imputed}{vector of paths to files imputed. In the case of fastPHASE,
+the elements are \emph{path/to/*_genotypes.out}. In the case of vcf files,
+the elements are \emph{path/to/*.vcf} or \emph{path/to/*.vcf.gz}. The order
+of elements of vector and masks should coincide.}
 
-\item{id}{character or numeric, id of computational experiment. In case you
-run several calculations with different model parameter to find the best
+\item{id}{character or numeric, id of computational experiment. If you run
+several calculations with different model parameter to find the optimal
 one, you can mark each run with id for the convinience of further
 visualization. The argument is optional.}
 }
 \value{
-A data frame with three columns: "alleles", "genotypes", and "id" if
-  provided. The first two contains the errors, the third one - id of the
-  experiment. The error is counted as \code{(1 - accuracy)}, where
-  \code{accuracy} is a proportion of correctly imputed genotypes and alleles.
-  By correctly imputed genotype we mean that both alleles coincided with the
-  original ones. The function returns the values for one set of test files.
+A data frame with two columns: "discordance" and "id". If \emph{id}
+  argument is not provided, only "discordance" is returned. It contains a
+  proportion of wrognly imputed genotypes. By this we mean that one or two
+  alleles are not coincided with the original ones. The function returns the
+  values for one set of test files.
 }
 \description{
 Counts the discordance of genotypes imputed.

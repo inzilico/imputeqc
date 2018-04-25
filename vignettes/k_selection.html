@@ -103,7 +103,7 @@ devtools::install_github(&quot;inzilico/imputeqc&quot;, build_vignettes = TRUE)<
 <p>An example of command for imputation with K = 10:</p>
 <pre><code>for i in $(seq 1 5); do fastPHASE -T10 -C25 -K10 -H-1 -n -Z -ok10/chr1.m$i masked/chr1.m$i.inp; done</code></pre>
 <p>We assume 5 test files (<em>chr1.m{1:5}.inp</em>) being in folder <em>/masked</em>.</p>
-<p>The code will produce 5 *chr1.m{1:5}_genotypes.out* files, where <em>chr1</em> is your identifier, <em>m{1:5}</em> is added by the above command, and *_genotypes.out* is given by fastPHASE. The imputed data sets are saved in <em>/k10</em> subdirectory.</p>
+<p>The code will produce 5 <em>chr1.m{1:5}_genotypes.out</em> files, where <em>chr1</em> is your identifier, <em>m{1:5}</em> is added by the above command, and <em>_genotypes.out</em> is given by fastPHASE. The imputed data sets are saved in <em>/k10</em> subdirectory.</p>
 <p>The above code helps us to agree input/output from different stages of workflow.</p>
 <p>Be aware this step takes a lot of computational time depending on the number of populations under consideration, the number markers, and, of course, the K. To speed up it, I use a <em>GNU parallel</em> tool. It allows to launch several processes in parallel on different CPUs.</p>
 <p>Upon accomplishing, we can estimate the quality of imputation.</p>

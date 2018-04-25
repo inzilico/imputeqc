@@ -2,7 +2,7 @@
 % Please edit documentation in R/generate_mask_set.R
 \name{GenerateMaskSet}
 \alias{GenerateMaskSet}
-\title{Generate set of masks}
+\title{Generate a set of masks}
 \usage{
 GenerateMaskSet(g, n, p)
 }
@@ -18,6 +18,6 @@ A list of length \emph{n} containing masks as matrices
 }
 \description{
 Given a proportion of genotypes to be masked at each loci
-\code{GenerateMaskSet} samples a set of different masks.
+\emph{GenerateMaskSet} samples a set of different masks.
 The number of masks in a set can vary.
 }

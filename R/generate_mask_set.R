@@ -1,7 +1,7 @@
-#' Generate set of masks
+#' Generate a set of masks
 #'
 #' Given a proportion of genotypes to be masked at each loci
-#' \code{GenerateMaskSet} samples a set of different masks.
+#' \emph{GenerateMaskSet} samples a set of different masks.
 #' The number of masks in a set can vary.
 #'
 #' @param g Character vector with sequences
