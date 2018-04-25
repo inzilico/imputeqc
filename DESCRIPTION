@@ -5,8 +5,8 @@ Version: 1.00.0
 Author: Gennady Khvorykh
 Maintainer: Gennady Khvorykh <info@inzilico.com>
 Description: Estimate the quality of genotype imputation with fastPHASE 
-    and BEAGLE tools by masked analysis. Find the optimal number of clusters 
-    for hapFLK test.  
+    and BEAGLE softwares by masked data analysis. Optimize the parameters 
+    of imputation model. Find the optimal number of clusters for hapFLK test.  
 URL: https://github.com/inzilico/imputeqc
 BugReports: https://github.com/inzilico/imputeqc/issues
 Depends: R (>= 3.4.2)
