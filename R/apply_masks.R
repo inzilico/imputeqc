@@ -1,28 +1,28 @@
 #' Apply set of masks to sequencies.
 #'
-#' Applies a set of masks to strings obtained with readFastPhase. The output is
-#' saved as fastPHASE *.inp file not including sample ids. It is ready for
-#' imputation with fastPHASE.
+#' Applies a set of masks to strings (haplotypes) obtained with readFastPhase.
+#' The output is saved as fastPHASE *.inp file not including sample ids. It is
+#' ready for imputation with fastPHASE.
 #'
-#' @param g Character vector with sequences
+#' @param g Character vector with original (notmasked) haplotypes
 #' @param masks List of masks as binary matrices
 #' @param pref path/to/prefix to save the result. The number of files created
 #'   equals to the length of masks. The filenames are generated automatically
 #'   like this: \code{prefix.m{n}.inp}, where \code{prefix} is a user defined
 #'   string, \code{n} is an ordinal number of the mask.
+#' @param vcf VCF-class object. If provided, the output will be saved as vcf. If
+#'   not, as fastPHASE inp file.
 #'
 #' @return No values
 #' @export
 #' @importFrom plyr progress_text
 #'
-#' @examples
-ApplyMasks <- function(g, masks, pref) {
+ApplyMasks <- function(g, masks, pref, vcf = NULL) {
 
   # Initilize
-  N <- length(g) # Number of sequences
-  M <- nchar(g[1]) # Number of markers
+  N <- length(g) # Number of haplotypes
 
-  # Loop throug all masks
+  # Loop through all masks and save the masked data obtained
   for (n in seq_along(masks)) {
 
     # Get indexes of masked genotypes
@@ -33,23 +33,15 @@ ApplyMasks <- function(g, masks, pref) {
 
     message(sprintf("Applying mask %s...", n))
 
-    # Lopp throug all sequences and mask them
+    # Loop throug all sequences and mask them
     gm <- plyr::llply(seq_len(N), .progress = plyr::create_progress_bar(name = "text"),
                 function(i, g, ind) MaskSequence(g[i], ind[[i]]), g = g, ind = ind)
 
-    # Set output filename
-    fn <- sprintf("%s.m%s.inp", pref, n)
+    # WriteFastPHASE(gm, pref, n)
 
-    # Remove output file if it exists
-    if(file.exists(fn)) file.remove(fn)
+    if(is.null(vcf)) { WriteFastPHASE(gm, pref, n)
+      } else { UpdateVCF(gm, pref, n, vcf) }
 
-    # Create output file
-    write(c(N/2, M), file = fn, ncolumns = 1)
-
-    # Write masked sequences to file
-    plyr::l_ply(gm, write, file = fn, append = T)
-
-    message(sprintf("File %s is saved", fn))
   }
 
 }

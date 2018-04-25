@@ -1,7 +1,18 @@
 What is it for
 --------------
 
-*imputeqc* is an R package and accompanied scripts to estimate the quality of imputation of genotypes that was made with [fastPHASE](http://scheet.org/software.html) tool. It allows to choose the appropriate number of haplotype clusters (K) for the search of selection fingerprints with [hapFLK](https://forge-dga.jouy.inra.fr/projects/hapflk) test.   
+*imputeqc* is an R package and accompanied scripts to estimate the quality of imputation of genotypes that was made with [fastPHASE](http://scheet.org/software.html) and [BEAGLE](https://faculty.washington.edu/browning/beagle/beagle.html) softwares. Any other tools that support *.inp fastPHASE or VCF files can be also considered. The package is based on masked data analysis. 
+
+Possible applications
+---------------------
+
+1. Estimation of the error of gynotype imputation.
+
+2. Optimization of the imputation model parameters, e.g., the number of haplotype clusters. The parameter can be further used for the search of signatures of selection with [hapFLK](https://forge-dga.jouy.inra.fr/projects/hapflk) test.
+
+3. Testing different reference panels for imputation.
+
+4. Benchmarking of different imputation softwares and strategies.
 
 Ho to install from GitHub
 --------------------------
@@ -31,6 +42,10 @@ browseVignettes("imputeqc")
 ```
 vignette("k_selection")
 ```
+
+License
+-------
+[MIT](https://en.wikipedia.org/wiki/MIT_License)
 
 Citing
 ------

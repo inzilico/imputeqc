@@ -1,7 +1,7 @@
 #!/usr/bin/Rscript
-# Script reads fastPHASE input file (*.inp), generates masks to hide randomly a
+# Script reads inp (fastPHASE input file) or vcf, generates masks to hide randomly a
 # given proportion of genotypes, applies masks to the input file, and saves test
-# files thus produced. Test files can be further sent to fastPHASE for
+# files thus produced. Test files can be further sent to fastPHASE and BEAGLE for
 # imputation.
 # Author: Gennady Khvorykh, http://inZilico.com
 
@@ -20,14 +20,17 @@ main <- function(){
                 metavar = "p"),
     make_option(c("-o", "--output"), type = "character", default = "test/test",
                 help = "output/path/prefix to save test files [default %default]",
-                metavar = "outputpath")
+                metavar = "outputpath"),
+    make_option(c("-s", "--swap"), type = "character", default = "F",
+                help = "If T, the haplotypes of diploid organism are swapped [default %default]",
+                metavar = "swap")
   )
 
   # Create parser
   parser <- OptionParser(usage = "%prog [options] input",
                          option_list = option.list,
                          prog = "make_test_files.R",
-                         description = "\ninput: full/path/to/filename.inp, where \"filename.inp\" is fastPHASE input file")
+                         description = "\ninput: full/path/to/filename.{inp,vcf}")
 
   # Read arguments from command line
   arguments <- parse_args(parser, positional_arguments = TRUE)
@@ -40,17 +43,34 @@ main <- function(){
     return(print_help(parser))
   }
 
+  # Check input file exist
+  if(!file.exists(input)) stop(input, " doesn't exist!", call. = F)
+
   # Get option arguments
   options <- arguments$options
   output <- options$output
+  swap <- options$swap
 
   # To measure the computation time
   start <- Sys.time()
 
-  # Read fastPHASE input file
-  g <- ReadFastPHASE(input)
+  # Get extention of input file
+  m <- regexpr("\\.([[:alnum:]]+)$", input)
+  ext <- regmatches(input, m)
+
+  # Load data
+  if(ext == ".vcf" | ext == ".gz") {
+    data <- ReadVCF(input, swap)
+    g <- data[["haps"]]
+    vcf <- data[["vcf"]]
+  }
+
+  if(ext == ".inp") g <- ReadFastPHASE(input)
 
   # Generate n masks
+  if(is.null(g)) stop("Haplotypes aren't loaded. Probably unknown type of input file!",
+                      call. = F)
+
   masks <- GenerateMaskSet(g, n = options$ntest, p = options$proportion)
 
   # Save `masks` as `masks.RDS` at the same directory as `output`
@@ -61,7 +81,7 @@ main <- function(){
   message(sprintf("File %s is saved", fn))
 
   # Apply masks to sequences and save the result in files
-  ApplyMasks(g, masks, output)
+  ApplyMasks(g, masks, output, vcf)
 
   # Show time elapsed
   Sys.time() - start

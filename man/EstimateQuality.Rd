@@ -7,16 +7,16 @@
 EstimateQuality(origin, masks, imputed, id = NULL)
 }
 \arguments{
-\item{origin}{path/to/filename.inp, where \code{filename.inp} is the original
-(unmasked) fastPHASE file}
+\item{origin}{path to original unmasked file}
 
 \item{masks}{path/to/masks.RDS, where \code{masks.RDS} keeps the masks
 created upstream with \code{\link{GenerateMaskSet}} and saved as
 \code{*.RDS}.}
 
-\item{imputed}{vector of \code{path/to/*_genotypes.out}. The files have
-genotypes imputed with fastPHASE. They should be in the same order as masks
-were generated.}
+\item{imputed}{vector of paths to files imputed. In the case of fastPHASE
+program the elements are \code{path/to/*_genotypes.out}. In the case of
+BEAGLE - \code{path/to/*.vcf} or \code{path/to/*.vcf.gz}. The order of
+elements of vector and masks should coincide.}
 
 \item{id}{character or numeric, id of computational experiment. In case you
 run several calculations with different model parameter to find the best
@@ -32,5 +32,5 @@ A data frame with three columns: "alleles", "genotypes", and "id" if
   original ones. The function returns the values for one set of test files.
 }
 \description{
-Estimates the error of allele and genotype imputation.
+Counts the discordance of genotypes imputed.
 }

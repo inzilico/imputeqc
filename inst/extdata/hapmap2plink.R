@@ -11,10 +11,6 @@ isBi <- function(x) {
   length(unique(tmp)) <= 2
 }
 
-# ## TODO: Remove after debug
-# args <- c("~/data/hapmap/phaseI/genotypes_chr22_CEU.txt.gz",
-#           "~/data/hapmap/phaseI/unrelated.txt")
-
 args <- commandArgs(TRUE)
 
 # Check input
@@ -72,6 +68,12 @@ map <- map[bi, ]
 ped <- ped[bi, ]
 
 if (sum(!bi) > 0) message("Non biallelic: ", sum(!bi))
+
+# Remove duplicates by positions
+dups <- duplicated(map[, 3])
+map <- map[!dups, ]
+ped <- ped[!dups, ]
+
 message("SNPs: ", nrow(map))
 
 #  Accomplish the creation of ped
@@ -81,7 +83,7 @@ ped <- cbind(0, ids, 0, 0, 0, -9, t(ped))
 write.table(map[, c(1, 2, 5, 3)], paste0(fn, ".map"), col.names = F, row.names = F, quote = F)
 write.table(ped, paste0(fn, ".ped"), col.names = F, row.names = F, quote = F)
 
-message("All done!")
+message("Converting to Plink done!")
 
 
 

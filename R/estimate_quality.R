@@ -1,15 +1,15 @@
 #' Estimate the quality of imputation
 #'
-#' Estimates the error of allele and genotype imputation.
+#' Counts the discordance of genotypes imputed.
 #'
-#' @param origin path/to/filename.inp, where \code{filename.inp} is the original
-#'   (unmasked) fastPHASE file
+#' @param origin path to original unmasked file
 #' @param masks path/to/masks.RDS, where \code{masks.RDS} keeps the masks
 #'   created upstream with \code{\link{GenerateMaskSet}} and saved as
 #'   \code{*.RDS}.
-#' @param imputed vector of \code{path/to/*_genotypes.out}. The files have
-#'   genotypes imputed with fastPHASE. They should be in the same order as masks
-#'   were generated.
+#' @param imputed vector of paths to files imputed. In the case of fastPHASE
+#'   program the elements are \code{path/to/*_genotypes.out}. In the case of
+#'   BEAGLE - \code{path/to/*.vcf} or \code{path/to/*.vcf.gz}. The order of
+#'   elements of vector and masks should coincide.
 #' @param id character or numeric, id of computational experiment. In case you
 #'   run several calculations with different model parameter to find the best
 #'   one, you can mark each run with id for the convinience of further
@@ -23,89 +23,99 @@
 #'   original ones. The function returns the values for one set of test files.
 #' @export
 #'
-#' @examples
 EstimateQuality <- function(origin, masks, imputed, id = NULL){
 
-  # Load original data set
-  g0 <- ReadFastPHASE(origin)
+  # Load unmasked data set
+  h0 <- LoadHaps(origin)
 
   # Convert to matrix
-  c0 <- seq2mat(g0)
-  rm(g0)
+  c0 <- seq2mat(h0)
+  rm(h0)
+
+  # Output missingness for unmasked data
+  ms <- c0 == "?"
+  message("Missingness of original data: ", round(sum(ms)/length(ms), 4))
 
   # Load masks
   masks <- readRDS(masks)
 
   # Initilize output
-  out <- list()
+  out <- vector("list", length(imputed))
 
-  # Loop through a vector with names of imputed files
+  # Loop through all imputed files
   for(i in seq_along(imputed)){
 
-    # Load imputed data for current mask
-    g1 <- ReadFastPHASE(imputed[i])
+    # Load imputed data as haplotypes
+    h <- LoadHaps(imputed[i])
 
-    # Convert to matrix
-    c1 <- seq2mat(g1)
-    rm(g1)
+    # Convert haplotypes into matrix with alleles
+    c1 <- seq2mat(h)
+    rm(h)
 
     # Select mask
-    m1 <- masks[[i]]
+    m <- masks[[i]]
 
     # Convert into TRUE/FALSE
-    m1 <- m1 == 1
+    m <- m == 1
 
     # Replicate rows
-    m1 <- m1[rep(seq_len(nrow(m1)), each = 2),]
+    m <- m[rep(seq_len(nrow(m)), each = 2),]
 
-    # Subset imputed alleles by mask
-    d0 <- c0[m1]
-    d1 <- c1[m1]
+    # Subset original and imputed alleles by mask
+    a0 <- c0[m]
+    a1 <- c1[m]
 
-    # Count statistics
-    if(is.null(id)) { out[[i]] <- CountStat(d0, d1)
-    } else { out[[i]] <- c(CountStat(d0, d1), id = id) }
+    # Generate vector with odd and even numbers
+    ind1 <- seq(1, length(a0), 2)
+    ind2 <- seq(2, length(a0), 2)
+
+    # Make data frame with odd and even numbers
+    indx <- data.frame(odd = ind1, even = ind2, stringsAsFactors = F)
+
+    # Count discordance of genotypes
+    ct <- vector("logical", nrow(indx))
+
+    for (j in seq_len(nrow(indx))) {
+      ct[j] <- sum(a0[c(indx$odd[j], indx$even[j])] %in%
+                     a1[c(indx$odd[j], indx$even[j])]) != 2
+    }
+
+    disc <- sum(ct)/length(ct)
+    disc <- round(disc, 6)
+    message("Discordance: ", disc)
+
+    # Make the output
+    if(is.null(id)) { out[[i]] <- c(disc = disc)
+    } else { out[[i]] <- c(discordance = disc, id = id) }
 
   }
 
   plyr::ldply(out, function(x) x)
 }
 
-CountStat <- function(a0, a1){
-  # Counts statistics for imputed alleles
-  # Args:
-  #  a0: original alleles
-  #  a1: imputed alleles
-  # Returns:
-  #  Vector with allele and genotype errors.
+#' Boxpolt discordance
+#'
+#' Draw boxplots of discordance estimated for different model parameters.
+#'
+#' @param fname path to dataframe with two columns 'disc' and 'id'
+#' @param tl optional title of the plot
+#' @param stl optional subtitle of the plot
+#'
+#' @return ggplot object
+#' @import ggplot2
+#' @export
+#'
+PlotDiscordance <- function(fname, tl = NULL, stl = NULL, id = NULL, ...){
 
-  # Check input
-  if(length(a0) != length(a1))
-    stop(sprintf("Vectors are not equal! Original: %s, imputed: %s",
-                 length(a0), length(a1)))
+  if(!file.exists(fname)) stop((sprintf("File %s doesn't exist", fname)))
 
-  out <- a0 == a1
+  # Load data set
+  df <- utils::read.table(fname, header = T)
 
-  # Count statistics
-  nalleles <- length(out)
-  ngenotypes <- nalleles/2
-  tp <- sum(out) # Number of true positive alleles
-
-  alleles <- (nalleles - tp)/nalleles
-
-  # Count true positive genotypes
-  t1 <- which(out == TRUE)
-  t2 <- t1[-1]
-  dif <- t2 - t1[-tp]
-
-  # How many odd indexes do we have?
-  ind <- t1[which(dif == 1)]
-
-  # Count accuracy of genotype imputation
-  acc <- sum(is.odd(ind))/ngenotypes
-
-  # Output statistics
-  c(alleles = alleles, genotypes = 1 - acc)
+  ggplot(df, aes(y = discordance, x = id, group = id)) + geom_boxplot(varwidth = TRUE) +
+    labs(title = ifelse(is.null(tl),"",tl), subtitle = ifelse(is.null(stl), "", stl),
+         y = "Discordance", x = ifelse(is.null(id), "", id)) +
+    scale_x_discrete(limits = c(5, 10, 15, 20, 25, 30, 35, 40, 45))
 
 }
 
@@ -123,3 +133,27 @@ seq2mat <- function(vec){
 
 # Checks whether the number is odd
 is.odd <- function(x) x %% 2 != 0
+
+LoadHaps <- function(input){
+  # Load data and convert them into haplotypes. fastPHASE as well as vcf or vcf
+  # gzipped formats are accessable.
+  # Args:
+  #  input: path/to/filename.{inp,vcf,vcf.gz}
+  # Returns: Vector with haplotypes
+
+  # Get extention of input file
+  m <- regexpr("\\.([[:alnum:]]+)$", input)
+  ext <- regmatches(input, m)
+
+  # Load data
+  g <- switch(ext,
+              .vcf = GetHaps(input),
+              .gz = GetHaps(input),
+              .inp = ReadFastPHASE(input),
+              .out = ReadFastPHASE(input))
+
+  if(is.null(g)) stop("Haplotypes aren't loaded!", call. = F)
+
+  return(g)
+
+}

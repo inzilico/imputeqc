@@ -4,10 +4,10 @@
 \alias{ApplyMasks}
 \title{Apply set of masks to sequencies.}
 \usage{
-ApplyMasks(g, masks, pref)
+ApplyMasks(g, masks, pref, vcf = NULL)
 }
 \arguments{
-\item{g}{Character vector with sequences}
+\item{g}{Character vector with original (notmasked) haplotypes}
 
 \item{masks}{List of masks as binary matrices}
 
@@ -15,12 +15,15 @@ ApplyMasks(g, masks, pref)
 equals to the length of masks. The filenames are generated automatically
 like this: \code{prefix.m{n}.inp}, where \code{prefix} is a user defined
 string, \code{n} is an ordinal number of the mask.}
+
+\item{vcf}{VCF-class object. If provided, the output will be saved as vcf. If
+not, as fastPHASE inp file.}
 }
 \value{
 No values
 }
 \description{
-Applies a set of masks to strings obtained with readFastPhase. The output is
-saved as fastPHASE *.inp file not including sample ids. It is ready for
-imputation with fastPHASE.
+Applies a set of masks to strings (haplotypes) obtained with readFastPhase.
+The output is saved as fastPHASE *.inp file not including sample ids. It is
+ready for imputation with fastPHASE.
 }

@@ -1,7 +1,8 @@
 ## Convert gziped HapMap file into simplified fastPHASE inp file. The output is
-## filename.inp, where `filename` is a basename extracted from input
-## filename.txt.gz file. Nonbiallelic sites are filtered out.
-## Usage: Rscript hapmap2fastphase.R filename.txt.gz unrelated.txt
+## filename.inp, where `filename` is a basename given as third argument.
+## If the argument isn't given, basename is extracted from input filename.txt.gz.
+## Nonbiallelic sites are filtered out.
+## Usage: Rscript hapmap2fastphase.R filename.txt.gz unrelated.txt output
 ## Author: Gennady Khvorykh, inzilico.com
 
 isBi <- function(x) {
@@ -24,8 +25,11 @@ if(!file.exists(args[2])) stop(args[2], " doesn't exist!")
 #           "~/data/hapmap/phaseI/unrelated.txt")
 
 # Get basename
-fn <- basename(args[1])
-fn <- sub(".txt.gz", "", fn)
+if(is.na(args[3])) {
+ fn <- basename(args[1])
+ fn <- sub(".txt.gz", "", fn)
+} else { fn <- args[3] }
+
 fn <- paste0(fn, ".inp")
 
 # Show input

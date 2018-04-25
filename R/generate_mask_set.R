@@ -11,7 +11,6 @@
 #' @return A list of length \emph{n} containing masks as matrices
 #' @export
 #'
-#' @examples
 GenerateMaskSet <- function(g, n, p){
 
   # Initilize variables
