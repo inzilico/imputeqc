@@ -32,7 +32,7 @@ devtools::install_github("inzilico/imputeqc", build_vignettes = TRUE)
 How to use
 ----------
 
-Read a vignette [How to Select the Number of Clusters for fastPHASE](https://htmlpreview.github.io/?https://github.com/inzilico/imputeqc/blob/master/inst/doc/k_selection.html). 
+Read a vignette [How to Select the Number of Clusters for fastPHASE](https://htmlpreview.github.io/?https://github.com/inzilico/imputeqc/blob/master/vignettes/k_selection.html). 
 
 * On a local machine, the vignette can be accessed as follow: 
 ```
