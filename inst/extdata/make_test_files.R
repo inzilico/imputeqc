@@ -65,7 +65,10 @@ main <- function(){
     vcf <- data[["vcf"]]
   }
 
-  if(ext == ".inp") g <- ReadFastPHASE(input)
+  if(ext == ".inp") {
+    g <- ReadFastPHASE(input)
+    vcf <- NULL
+  }
 
   # Generate n masks
   if(is.null(g)) stop("Haplotypes aren't loaded. Probably unknown type of input file!",
