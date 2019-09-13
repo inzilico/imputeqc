@@ -17,13 +17,22 @@ Possible applications
 Ho to install from GitHub
 --------------------------
 
-1. Make sure you have [devtools](https://github.com/r-lib/devtools) package installed. Run from R
+Run from R.
+
+1. Make sure you have [devtools](https://github.com/r-lib/devtools) package installed. 
 
 ```
 install.packages("devtools")
 ```
 
-2. Install *imputeqc*
+2. Install dependencies
+
+```
+install.packages("BiocManager")
+BiocManager::install("VariantAnnotation")
+```
+
+3. Install *imputeqc*
 
 ```
 devtools::install_github("inzilico/imputeqc", build_vignettes = TRUE)
