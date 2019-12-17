@@ -37,8 +37,7 @@ ApplyMasks <- function(g, masks, pref, vcf = NULL) {
     gm <- plyr::llply(seq_len(N), .progress = plyr::create_progress_bar(name = "text"),
                 function(i, g, ind) MaskSequence(g[i], ind[[i]]), g = g, ind = ind)
 
-    # WriteFastPHASE(gm, pref, n)
-
+    # Save output
     if(is.null(vcf)) { WriteFastPHASE(gm, pref, n)
       } else { UpdateVCF(gm, pref, n, vcf) }
 
