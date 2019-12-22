@@ -3,15 +3,20 @@
 #' Read vcf files
 #'
 #' Read vcf and vcf.gz files having both phased or unphased genotypes. The
-#' missing genotypes can be presented as '.' or './.'
+#' missing genotypes in vcf file can be presented as '.' or './.'
+#' \emph{ReadVCF()} is based on \emph{readVcf()} function from
+#' VariantAnnotation R package that loads a vcf file as vcf-class object.
+#' \emph{ReadVCF()} extracts the genotypes from vcf-class object and converts them
+#' in a vector of strings formed by letters A, T, C, G and a symbol of missing data '?'.
 #'
 #' @param x path/to/filename.vcf or vcf.gz
 #' @param ... an optional parameter \emph{swap} that can be passed to
 #'   \emph{Geno2Haps()} function. If \emph{swap} is TRUE, the haplotypes of an
 #'   individual are swapped.
 #' @return A list with two elements: vcf-class object and a character vector which
-#'   elements are strings of letters representing haplotypes. The length of
+#'   elements are strings of letters A, T, C, G, and symbol '?'. The length of
 #'   vector is 2N, where N is the number of diploid individuals.
+#'   The length of the string equals to the number of markers in vcf file.
 #' @export
 #'
 ReadVCF <- function(x, ...){
