@@ -100,23 +100,28 @@ EstimateQuality <- function(origin, masks, imputed, id = NULL){
 #' @param tl optional title of the plot
 #' @param stl optional subtitle of the plot
 #' @param id optional x-axis label
-#' @param ... other parameters that can be passed to \emph{ggplot2} functions
 #'
 #' @return ggplot object
 #' @import ggplot2
 #' @export
 #'
-PlotDiscordance <- function(fname, tl = NULL, stl = NULL, id = NULL, ...){
+PlotDiscordance <- function(fname, tl = NULL, stl = NULL, id = NULL){
 
   if(!file.exists(fname)) stop((sprintf("File %s doesn't exist", fname)))
 
   # Load data set
   df <- utils::read.table(fname, header = T)
 
-  ggplot(df, aes(y = discordance, x = id, group = id)) + geom_boxplot(varwidth = TRUE) +
+  # Plot
+  p <- ggplot(df, aes(y = discordance, x = id, group = id)) + geom_boxplot(varwidth = TRUE) +
     labs(title = ifelse(is.null(tl),"",tl), subtitle = ifelse(is.null(stl), "", stl),
          y = "Discordance", x = ifelse(is.null(id), "", id)) +
-    scale_x_discrete(limits = c(5, 10, 15, 20, 25, 30, 35, 40, 45))
+    scale_x_discrete(limits = c(5, 10, 15, 20, 25, 30, 35, 40, 45)) +
+    theme(axis.text = element_text(size = 12), axis.title = element_text(size = 14),
+          title = element_text(size = 16))
+
+  # Return ggplot object
+  return(p)
 
 }
 

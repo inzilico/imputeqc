@@ -4,7 +4,9 @@
 #' \emph{GenerateMaskSet} samples a set of different masks.
 #' The number of masks in a set can vary.
 #'
-#' @param g Character vector with sequences
+#' @param g Character vector. The elements are sequences made of alleles.
+#' The length of \emph{g} equals to 2*\emph{N}, where \emph{N} is the number of
+#' individulas, assuming the ploidy of 2.
 #' @param n Number of masks to be generated
 #' @param p Proportion of genotypes to be masked at each loci
 #'
