@@ -1,6 +1,6 @@
 #!/usr/bin/Rscript
 # Script reads inp (fastPHASE input file) or vcf, generates masks to hide randomly a
-# given proportion of genotypes, applies masks to the input file, and saves test
+# given proportion of genotypes or a given proportion of markers, applies masks to the input file, and saves test
 # files thus produced. Test files can be further sent to fastPHASE and BEAGLE for
 # imputation.
 # Author: Gennady Khvorykh, http://inZilico.com
@@ -21,6 +21,10 @@ main <- function(){
     make_option(c("-o", "--output"), type = "character", default = "test/test",
                 help = "output/path/prefix to save test files [default %default]",
                 metavar = "outputpath"),
+    make_option(c("-t", "--type"), type = "character", default = "genotype",
+                help = "Type of masking (genotype/marker). To hide genotypes set 'genotype',
+                and to hide marker set 'marker'. [default %default]",
+                metavar = "type"),
     make_option(c("-s", "--swap"), type = "character", default = "F",
                 help = "If T, the haplotypes of diploid organism are swapped [default %default]",
                 metavar = "swap")
@@ -74,7 +78,10 @@ main <- function(){
   if(is.null(g)) stop("Haplotypes aren't loaded. Probably unknown type of input file!",
                       call. = F)
 
-  masks <- GenerateMaskSet(g, n = options$ntest, p = options$proportion)
+  masks <- GenerateMaskSet(g = g,
+                           n = options$ntest,
+                           p = options$proportion,
+                           type = options$type)
 
   # Save `masks` as `masks.RDS` at the same directory as `output`
   dir <- dirname(output)

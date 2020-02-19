@@ -4,7 +4,7 @@
 \alias{PlotDiscordance}
 \title{Boxpolt discordance}
 \usage{
-PlotDiscordance(fname, tl = NULL, stl = NULL, id = NULL, ...)
+PlotDiscordance(fname, tl = NULL, stl = NULL, id = NULL)
 }
 \arguments{
 \item{fname}{path to dataframe with two columns 'discordance' and 'id'}
@@ -14,8 +14,6 @@ PlotDiscordance(fname, tl = NULL, stl = NULL, id = NULL, ...)
 \item{stl}{optional subtitle of the plot}
 
 \item{id}{optional x-axis label}
-
-\item{...}{other parameters that can be passed to \emph{ggplot2} functions}
 }
 \value{
 ggplot object

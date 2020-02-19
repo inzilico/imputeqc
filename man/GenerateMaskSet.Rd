@@ -7,7 +7,9 @@
 GenerateMaskSet(g, n, p)
 }
 \arguments{
-\item{g}{Character vector with sequences}
+\item{g}{Character vector. The elements are sequences made of alleles.
+The length of \emph{g} equals to 2*\emph{N}, where \emph{N} is the number of
+individulas, assuming the ploidy of 2.}
 
 \item{n}{Number of masks to be generated}
 

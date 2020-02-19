@@ -1,24 +1,55 @@
 #' Generate a set of masks
 #'
-#' Given a proportion of genotypes to be masked at each loci
+#' Two types of masks can be generated. The first one hides the genotypes and
+#' the second one hides the markers. Actually, both hides the genotypes,
+#' but in the first case they are randomly distributed all over the chromosome,
+#' while in the second one they are groupped to one or several markers in such a way
+#' that the whole marker is hidden. That is why we say that we hide markers.
+#'
+#' Thus, given a proportion of genotypes to be masked at each loci or
+#' a proportion of markers to be masked in chromosome
 #' \emph{GenerateMaskSet} samples a set of different masks.
-#' The number of masks in a set can vary.
+#'
+#' The number of masks in a set can vary in both cases.
 #'
 #' @param g Character vector. The elements are sequences made of alleles.
 #' The length of \emph{g} equals to 2*\emph{N}, where \emph{N} is the number of
 #' individulas, assuming the ploidy of 2.
 #' @param n Number of masks to be generated
-#' @param p Proportion of genotypes to be masked at each loci
+#' @param p Proportion of genotypes to be masked at each loci or proportion of
+#' markers to be masked in chromosome
+#' @param type Type of masking. "genotype" for hiding genotypes and "marker" for
+#' hiding the markers. The default is "genotype".
 #'
 #' @return A list of length \emph{n} containing masks as matrices
 #' @export
 #'
-GenerateMaskSet <- function(g, n, p){
+GenerateMaskSet <- function(g, n, p, type = "genotype"){
 
   # Initilize variables
   M <- nchar(g[1]) # number of markers
   N <- length(g)/2 # number of individuals
   out <- list()
+
+  if (type == "marker") {
+    message("Hiding of markers is choosen")
+    # Create first mask
+    snps <- 1:M
+    size <- floor(p*M)
+    ind <- sample(x = snps, size = size)
+    out[[1]] <- makeMask(N, M, ind)
+
+    # Make list with other masks
+    for (i in 2:n) {
+      snps <- snps[!snps %in% ind]
+      ind <- sample(x = snps, size = size)
+      out[[i]] <- makeMask(N, M, ind)
+    }
+
+    return(out)
+  }
+
+  message("Hiding of genotypes is choosen")
 
   # Create a binary matrix with originally missing values
   m0 <- GetMissing(g, M)
@@ -43,7 +74,7 @@ GenerateMaskSet <- function(g, n, p){
     # Update genotypes that are alreade masked
     masked <- Reduce('+', out)
   }
-  out
+  return(out)
 }
 
 GenerateMask <- function(m, masked, size){
@@ -118,4 +149,15 @@ GetMissing <- function(data, M){
   m
 }
 
+makeMask <- function(i, j, x) {
+  # Crates matrix with 0, where columns x are filled with 1.
+  # Args:
+  #  i, j: the number of rows and columns
+  #  x: a vector with columns
+  # Returns:
+  #  Matrix
+  m <- matrix(0L, nrow = i, ncol = j)
+  m[, x] <- 1
+  m
+}
 
