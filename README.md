@@ -6,7 +6,7 @@ What is it
 Possible applications
 ---------------------
 
-1. Estimation of the error of gynotype imputation.
+1. Estimation of the error of genotype imputation.
 
 2. Optimization of the imputation model parameters, e.g., the number of haplotype clusters. The parameter can be further used for the search of signatures of selection with [hapFLK](https://forge-dga.jouy.inra.fr/projects/hapflk) test.
 
