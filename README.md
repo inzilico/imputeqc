@@ -58,7 +58,10 @@ License
 
 Citing
 ------
-Gennady Khvorykh. inzilico/imputeqc v1.0.0 (2018). GitHub repository, https://github.com/inzilico/imputeqc.
+Khvorykh GV, Khrunin AV. imputeqc: an R package for assessing imputation quality of genotypes and optimizing imputation parameters. BMC Bioinformatics. 2020;21(Suppl 12):304. Published 2020 Jul 24. doi:10.1186/s12859-020-03589-0
+
+[pubmed](https://pubmed.ncbi.nlm.nih.gov/32703240/)
+[pdf](https://bmcbioinformatics.biomedcentral.com/track/pdf/10.1186/s12859-020-03589-0)
 
 Contacts
 --------
