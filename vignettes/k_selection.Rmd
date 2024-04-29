@@ -21,13 +21,13 @@ knitr::opts_chunk$set(
 Motivation
 -----------
 
-Assume you have a Plink files and decided to impute the missing genotypes with fastPHASE 1.4.8 tool. The number of haplotype clusters (K) is required as an argument. One option is to leave the default value of 15. For the most cases it will probably work. But what if you have several populations in one file? Say, you search for the fingerprints of selection with hapFLK tool. Both hapFLK and fastPHASE are based on the haplotype cluster model. 
+Assume you have Plink files and you decided to impute the missing genotypes with [fastPHASE 1.4.8](http://stephenslab.uchicago.edu/software.html#fastphase). The number of haplotype clusters (K) is required as an argument. One option is to leave the default value of 15. For most cases, it will probably work. But what if you have several populations in one file? Say, you search for the fingerprints of selection with the hapFLK tool. Both hapFLK and fastPHASE are based on the haplotype cluster model. 
 
-How many clusters to choose for 4, 6, 8 or even more populations in a pool? My tests of datasets from 1000 Genomes project revealed that K influences the results of hapFLK output. If fastPHASE had an option to estimate the error of imputation, the life would be easier. We could apply the masked data analysis. 
+How many clusters to choose for 4, 6, 8 or even more populations in a pool? My tests of datasets from the 1000 Genomes project revealed that K influences the results of hapFLK output. If fastPHASE had an option to estimate the error of imputation, the life would be easier. We could apply the masked data analysis. 
 
 The idea of the analysis is as follow. Hide some genotypes, impute them, then count the error of imputation. Repeat the trick several times with different K and choose that one that minimizes the error of imputation.      
 
-Below is the implementation of the masked data analysis on the base of [imputeqc](https://github.com/inzilico/imputeqc) R package. Let's list 4 main steps and then consider them a little bit closer.
+Below is the implementation of the masked data analysis on the base of the [imputeqc](https://github.com/inzilico/imputeqc) R package. Let's list 4 main steps and then consider them a little bit closer.
 
 Workflow to select the best K
 ------------------------------
@@ -40,6 +40,8 @@ Workflow to select the best K
 
 4. Estimate the imputation quality with *EstimateQuality()* function and chose the K that minimizes the imputation error. 
 
+The latter 3 steps can be automated with the [selectK.sh](https://github.com/evodify/imputeqc/selectK.sh) script. Run `./selectK.sh` to see the options.
+
 How to convert Plink files to fastPHASE
 ---------------------------------------
 
@@ -47,7 +49,7 @@ Say, you have *chr1.{ped, map}* files in the current directory. They  contain th
 
 Check that alleles are coded as letters or numbers. The missing ones should be *?*. If your data look differently, send me a chunk of them. I'll figure out what to do next.
 
-To convert Plink files to fastPHASE, run from command line
+To convert Plink files to fastPHASE, run from the command line
 
     plink --file chr1 --recode fastphase-1chr --out chr1
     
@@ -63,7 +65,7 @@ install.packages("devtools")
 devtools::install_github("inzilico/imputeqc", build_vignettes = TRUE)
 ```
 
-If you already have *devtools* package installed, skip the first command.
+If you already have the *devtools* package installed, skip the first command.
 
 2. Get the path to *make_test_files.R* which comes with *imputeqc*. Run in R 
 
@@ -78,24 +80,24 @@ $ export IMPQC="/path/to/imputeqc/extdata"
 
 3. Run *make_test_files.R* to generate *n* test files of fastPHASE format (\*.inp), each having *p* proportion of genotypes randomly masked.
 
-Let *chr1.inp* to contain the genotypes of a population from the chromosome one.
+Let *chr1.inp* contain the genotypes of a population from the chromosome one.
 
 The following command will result in 5 test files with 10% percent of genotypes missed.
 
     Rscript $IMPQC/make_test_files.R chr1.inp 
 
-The default parameters (-n 5 -p 0.1 -o test/test) are applied. Five test files named *test.m{1:5}.inp* are saved in */test* subdirectory created by the script.
+The default parameters (-n 5 -p 0.1 -o test/test) are applied. Five test files named *test.m{1:5}.inp* are saved in the */test* subdirectory created by the script.
 
-The following command will produce 3 test files with 5% of genotypes masked. The test files *chr1.m{1:3}.inp* are saved in */masked* subdirectory.
+The following command will produce 3 test files with 5% of genotypes masked. The test files *chr1.m{1:3}.inp* are saved in the */masked* subdirectory.
 
     Rscript $IMPQC/make_test_files.R -n 3 -p 0.05 -o masked/chr1 chr1.inp 
 
-If there are missing genotypes before running the script, the actual proportion of missing genotypes will be higher, since mask adds missing genotypes to those that exist in original data set. You will see the total proportion of missing genotypes on screen. 
+If there are missing genotypes before running the script, the actual proportion of missing genotypes will be higher, since mask adds missing genotypes to those that exist in the original data set. You will see the total proportion of missing genotypes on screen. 
 
-The usage of fastPHASE tool
+The usage of fastPHASE
 ---------------------------
 
-According to fastPHASE manual, we can adjust the following option arguments:
+According to the fastPHASE manual, we can adjust the following options:
 
 -   -T, the number of seeds to launch Expectation-Maximization (EM) cycles
 -   -C, the number of EM cycles
@@ -103,30 +105,30 @@ According to fastPHASE manual, we can adjust the following option arguments:
 
 There are some flags I advice to apply:
 
--   -H-1, to turn off the phasing, since we need only imputation
+-   -H-1, to turn off the phasing, since we need only the imputation
 -   -n, to tell that we have simplified input, since *make_test_files.R* produces that sort of files
 -   -Z, to simplify the format of output files
 
 I recommend to save the results of imputation in different folders for different K (*/k10*, */k15*, etc. )
 
-An example of command for imputation with K = 10:
+An example of the command for imputation with K = 10:
 
-    for i in $(seq 1 5); do fastPHASE -T10 -C25 -K10 -H-1 -n -Z -ok10/chr1.m$i masked/chr1.m$i.inp; done
+    for i in $(seq 1 5); do fastPHASE -T10 -C25 -K10 -H-1 -n -Z -ok10 test/chr1.m$i.inp masked/chr1.m$i.inp; done
 
 We assume 5 test files (*chr1.m{1:5}.inp*) being in folder */masked*.
 
-The code will produce 5 *chr1.m{1:5}\_genotypes.out* files, where *chr1* is your identifier, *m{1:5}* is added by the above command, and *\_genotypes.out* is given by fastPHASE. The imputed data sets are saved in */k10* subdirectory.
+The code will produce 5 *chr1.m{1:5}\_genotypes.out* files, where *chr1* is your identifier, *m{1:5}* is added by the above command, and *\_genotypes.out* is given by fastPHASE. The imputed data sets are saved in the */k10* subdirectory.
 
-The above code helps us to agree input/output from different stages of workflow.
+The above code helps us to agree input/output from different stages of the workflow.
 
-Be aware this step takes a lot of computational time depending on the number of populations under consideration, the number markers, and, of course, the K. To speed up it, I use a *GNU parallel* tool. It allows to launch several processes in parallel on different CPUs.
+Be aware this step takes a lot of computational time depending on the number of populations under consideration, the number markers, and, of course, the K. To speed up it, I use [GNU parallel](https://www.gnu.org/software/parallel/). It allows launching several processes in parallel.
 
 Upon accomplishing, we can estimate the quality of imputation.
 
 The usage of EstimateQuality()
 -----------------------------
 
-There are several metrics to estimate the imputation quality of genotypes (Chan et al, 2016). So far I applied the proportion of wrongly imputed genotypes. To compute it, use *EstimateQuality()* function. It returns a data frame with two columns: "discrepancy" and "id". The first one contains the proportion of genotypes that are not coincided with the original ones. The genotype is considered to be imputed wrongly if one or two alleles are not coincided. 
+There are several metrics to estimate the imputation quality of genotypes (Chan et al, 2016). So far I applied the proportion of wrongly imputed genotypes. To compute it, use *EstimateQuality()* function. It returns a data frame with two columns: "discrepancy" and "id". The first one contains the proportion of genotypes that differ from the original ones. The genotype is considered to be imputed wrongly if there is a discrepancy in one or two alleles.
 
 The function returns the values for one set of test files. To distinguish different sets, use an optional argument *id*. It can be considered as an identification of different imputations.   
 
