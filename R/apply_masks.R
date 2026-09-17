@@ -15,7 +15,6 @@
 #'
 #' @return No values
 #' @export
-#' @importFrom plyr progress_text
 #'
 ApplyMasks <- function(g, masks, pref, vcf = NULL) {
 
@@ -25,17 +24,17 @@ ApplyMasks <- function(g, masks, pref, vcf = NULL) {
   # Loop through all masks and save the masked data obtained
   for (n in seq_along(masks)) {
 
-    # Get indexes of masked genotypes
-    ind <- plyr::alply(masks[[n]], 1, function(v) which(v == 1))
-
-    # Replicate indexes
+    # Get indexes of masked genotypes per individual and replicate them
+    # for the two haplotypes
+    ind <- lapply(seq_len(nrow(masks[[n]])),
+                  function(i) which(masks[[n]][i, ] == 1))
     ind <- rep(ind, each = 2)
 
-    message(sprintf("Applying mask %s...", n))
+    message("Applying mask ", n, "...")
 
     # Loop throug all sequences and mask them
-    gm <- plyr::llply(seq_len(N), .progress = plyr::create_progress_bar(name = "text"),
-                function(i, g, ind) MaskSequence(g[i], ind[[i]]), g = g, ind = ind)
+    gm <- vapply(seq_len(N), function(i) MaskSequence(g[i], ind[[i]]),
+                 character(1), USE.NAMES = FALSE)
 
     # Save output
     if(is.null(vcf)) { WriteFastPHASE(gm, pref, n)
@@ -54,7 +53,9 @@ MaskSequence <- function(sequence, positions, symbol = "?"){
   # Returns:
   #   Sequence where some bases are replaced by symbol
 
-  # Loop throug all positions to be replaced
-  for(x in positions) substr(sequence, start = x, stop = x) <- symbol
-  sequence
+  if (length(positions) == 0) return(sequence)
+
+  ch <- strsplit(sequence, "", fixed = TRUE)[[1]]
+  ch[positions] <- symbol
+  paste(ch, collapse = "")
 }

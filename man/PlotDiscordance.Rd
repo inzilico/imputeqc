@@ -7,7 +7,7 @@
 PlotDiscordance(fname, tl = NULL, stl = NULL, id = NULL)
 }
 \arguments{
-\item{fname}{path to dataframe with two columns 'discordance' and 'id'}
+\item{fname}{path to dataframe with columns 'discordance' and 'id'}
 
 \item{tl}{optional title of the plot}
 
@@ -20,4 +20,10 @@ ggplot object
 }
 \description{
 Draw boxplots of discordance estimated for different model parameters.
+}
+\details{
+The levels of the x axis are inferred from the \emph{id} column. When the
+table comes from an allele-frequency-stratified run of
+\code{\link{EstimateQuality}} (i.e. it has an \emph{af_bin} column), only
+the overall rows (\code{af_bin == "ALL"}) are plotted.
 }

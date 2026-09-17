@@ -4,7 +4,7 @@
 \alias{EstimateQuality}
 \title{Estimate the quality of imputation}
 \usage{
-EstimateQuality(origin, masks, imputed, id = NULL)
+EstimateQuality(origin, masks, imputed, id = NULL, af_bins = NULL)
 }
 \arguments{
 \item{origin}{path to original unmasked file}
@@ -15,21 +15,48 @@ created upstream with \emph{\link{GenerateMaskSet}} and saved as
 
 \item{imputed}{vector of paths to files imputed. In the case of fastPHASE,
 the elements are \emph{path/to/*_genotypes.out}. In the case of vcf files,
-the elements are \emph{path/to/*.vcf} or \emph{path/to/*.vcf.gz}. The order
-of elements of vector and masks should coincide.}
+the elements are \emph{path/to/*.vcf}, \emph{*.vcf.gz} or \emph{*.vcf.bgz}.
+The order of elements of vector and masks should coincide.}
 
 \item{id}{character or numeric, id of computational experiment. If you run
 several calculations with different model parameter to find the optimal
 one, you can mark each run with id for the convinience of further
 visualization. The argument is optional.}
+
+\item{af_bins}{optional numeric vector of minor allele frequency breaks.
+When given, the discordance is additionally estimated per MAF stratum of
+the original data. The breaks must cover the interval from 0 to 0.5, e.g.
+\code{c(0, 0.01, 0.05, 0.1, 0.5)}; the strata are intervals open on the
+left and closed on the right. The result then contains one row per
+imputed file and stratum, the overall row marked as \code{"ALL"} in the
+\emph{af_bin} column.}
 }
 \value{
-A data frame with two columns: "discordance" and "id". If \emph{id}
-  argument is not provided, only "discordance" is returned. It contains a
-  proportion of wrognly imputed genotypes. By this we mean that one or two
-  alleles are not coincided with the original ones. The function returns the
-  values for one set of test files.
+A data frame with columns \emph{discordance},
+  \emph{allele_discordance}, \emph{n_masked}, \emph{n_unfilled} and
+  \emph{mask} (ordinal number of the mask) for every imputed file, and
+  optional \emph{id}. When \emph{af_bins} is given, the column \emph{af_bin}
+  is appended and one row per stratum (plus the overall \code{"ALL"} row)
+  is returned for every imputed file.
 }
 \description{
 Counts the discordance of genotypes imputed.
+}
+\details{
+A masked genotype is called discordant when its allele pair (order
+ignored) differs from the allele pair of the original genotype. The
+discordance is the proportion of such genotypes among all hidden ones.
+Since version 1.1.0 the comparison is symmetric: a homozygote imputed as
+heterozygote counts as discordant, as well as the other way round. The
+allele discordance is also reported: the proportion of mismatched alleles
+among all alleles of the hidden genotypes. Genotypes that the imputation
+tool left missing are counted as discordant and are additionally reported
+in the \emph{n_unfilled} column.
+
+The function aligns the imputed and original genotypes by position. For
+VCF inputs the marker ids (rownames) and sample ids are checked when
+available: an error is raised when the markers are not identical and in
+the same order, or when the sample sets differ; a permuted sample order is
+silently re-ordered. When imputing with a reference panel (e.g. BEAGLE),
+subset the imputed output back to the markers of the original file first.
 }

@@ -7,17 +7,20 @@
 ReadVCF(x, ...)
 }
 \arguments{
-\item{x}{path/to/filename.vcf or vcf.gz}
+\item{x}{path/to/filename.vcf, .vcf.gz or .vcf.bgz}
 
 \item{...}{an optional parameter \emph{swap} that can be passed to
 \emph{Geno2Haps()} function. If \emph{swap} is TRUE, the haplotypes of an
 individual are swapped.}
 }
 \value{
-A list with two elements: vcf-class object and a character vector which
+A list with four elements: vcf-class object, a character vector which
   elements are strings of letters A, T, C, G, and symbol '?'. The length of
   vector is 2N, where N is the number of diploid individuals.
   The length of the string equals to the number of markers in vcf file.
+  Sample ids and marker ids are returned as third and fourth elements
+  (NULL when not available); they can be passed to
+  \code{\link{GenerateMaskSet}} to annotate the masks.
 }
 \description{
 Read vcf and vcf.gz files having both phased or unphased genotypes. The

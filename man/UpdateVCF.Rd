@@ -4,7 +4,7 @@
 \alias{UpdateVCF}
 \title{Update genotypes of vcf file}
 \usage{
-UpdateVCF(haps, pref, n, vcf)
+UpdateVCF(haps, pref, n, vcf, compress = FALSE)
 }
 \arguments{
 \item{haps}{character vector with haplotypes}
@@ -17,6 +17,10 @@ extention is added.}
 
 \item{vcf}{vcf-class object loaded with \emph{readVcf()} function from
 VariantAnnotation package. The genotypes of this object we want to update.}
+
+\item{compress}{logical. If TRUE, the output is written bgzip-compressed
+with the .vcf.gz extention. Such files are ready for tabix indexing.
+The default is FALSE (plain .vcf as in previous versions).}
 }
 \description{
 Update GT fields of vcf file by haplotypes provided. Updated file is saved

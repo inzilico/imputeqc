@@ -17,10 +17,10 @@ automatically like this: \emph{prefix.m{n}.inp}, where \emph{prefix} is a
 user defined string, \emph{n} is an ordinal number of the mask.}
 
 \item{vcf}{VCF-class object. If provided, the output will be saved as vcf
-file. If not, as fastPHASE inp file.}
+file. If not, as fastPHASE inp file (default).}
 }
 \value{
-No values
+No value
 }
 \description{
 Applies a set of masks to haplotypes obtained with readFastPhase. The output

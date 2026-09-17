@@ -4,7 +4,7 @@
 \alias{GenerateMaskSet}
 \title{Generate a set of masks}
 \usage{
-GenerateMaskSet(g, n, p)
+GenerateMaskSet(g, n, p, type = "genotype", samples = NULL, markers = NULL)
 }
 \arguments{
 \item{g}{Character vector. The elements are sequences made of alleles.
@@ -13,13 +13,39 @@ individulas, assuming the ploidy of 2.}
 
 \item{n}{Number of masks to be generated}
 
-\item{p}{Proportion of genotypes to be masked at each loci}
+\item{p}{Proportion of genotypes to be masked at each loci or proportion of
+markers to be masked in chromosome}
+
+\item{type}{Type of masking. "genotype" for hiding genotypes and "marker" for
+hiding the markers. The default is "genotype".}
+
+\item{samples}{Optional character vector of length \emph{N} with sample ids.
+If given, the ids are attached to the masks as row names.}
+
+\item{markers}{Optional character vector of length \emph{M} with marker ids
+(e.g. rs numbers). If given, the ids are attached to the masks as column
+names. Dimnames make the masks self-describing; they are used by
+\code{\link{WriteMaskSet}} and enable the consistency checks in
+\code{\link{EstimateQuality}}.}
 }
 \value{
-A list of length \emph{n} containing masks as matrices
+A list of length \emph{n} containing masks as binary (0/1) matrices
+  with \emph{N} rows and \emph{M} columns, where 1 marks a hidden genotype.
 }
 \description{
-Given a proportion of genotypes to be masked at each loci
+Two types of masks can be generated. The first one hides the genotypes and
+the second one hides the markers. Actually, both hides the genotypes,
+but in the first case they are randomly distributed all over the chromosome,
+while in the second one they are groupped to one or several markers in such a way
+that the whole marker is hidden. That is why we say that we hide markers.
+Thus, given a proportion of genotypes to be masked at each loci or
+a proportion of markers to be masked in chromosome
 \emph{GenerateMaskSet} samples a set of different masks.
-The number of masks in a set can vary.
+}
+\details{
+The number of masks in a set can vary. The masks within one
+set are drawn disjointly: genotypes hidden by earlier masks are never
+re-drawn by later ones, so together the masks of a set cover about
+\code{n * p} of the available genotypes. Call \code{\link{set.seed}}
+beforehand to make the masks reproducible.
 }

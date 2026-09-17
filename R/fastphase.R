@@ -55,7 +55,9 @@ WriteFastPHASE <- function(g, pref, n = NULL) {
   write(c(N/2, M), file = fn, ncolumns = 1)
 
   # Write masked sequences to file
-  plyr::l_ply(g, write, file = fn, append = T)
+  con <- file(fn, open = "a")
+  on.exit(close(con), add = TRUE)
+  writeLines(g, con)
 
   message(sprintf("File %s is saved", fn))
 

@@ -1,0 +1,177 @@
+---
+title: "Estimating the Quality of BEAGLE Imputation with Masked Data"
+author: "Gennady Khvorykh, [inzilico.com](http://inzilico.com)"
+date: "`r Sys.Date()`"
+output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{Estimating the Quality of BEAGLE Imputation with Masked Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Motivation
+-----------
+
+You have genotyped your samples on a SNP array and imputed the missing
+genotypes with [BEAGLE](https://faculty.washington.edu/browning/beagle/beagle.html).
+How good is the imputation? The internal metrics printed by BEAGLE (or stored
+in the INFO field of the output) are estimates. The masked data analysis gives
+you an empirical answer: hide a small proportion of the known genotypes,
+impute them as if they were missing, and compare with the truth.
+
+This vignette walks through the whole workflow with VCF files. BEAGLE itself
+is not run inside the vignette; instead, the imputation is simulated by
+copying the true genotypes back with a few errors introduced. Replace the
+simulation with your real BEAGLE runs when you work with your data — the
+shell commands are given in place.
+
+The data
+--------
+
+We use a small VCF file with 20 individuals genotyped at 200 SNPs, which
+ships with the package.
+
+```{r}
+library(imputeqc)
+vcf_file <- system.file("extdata", "beagle.vcf", package = "imputeqc")
+x <- ReadVCF(vcf_file)
+```
+
+`ReadVCF()` returns the VCF object, the haplotypes as strings, and the sample
+and marker ids read from the file:
+
+```{r}
+length(x$haps)      # 2N haplotypes
+nchar(x$haps[1])    # of M markers
+head(x$samples, 3)
+head(x$markers, 3)
+```
+
+Masking
+-------
+
+We hide 5% of genotypes at each locus and repeat this three times — with
+only 20 samples, 1% would round to zero genotypes per locus; on real data
+1% is the usual choice. The masks of one set are disjoint: together they
+hide about 15% of the available genotypes, each hidden exactly once. Call
+`set.seed()` beforehand to make the masks reproducible.
+
+```{r}
+set.seed(42)
+masks <- GenerateMaskSet(x$haps, n = 3, p = 0.05,
+                         samples = x$samples, markers = x$markers)
+saveRDS(masks, "masks.RDS")
+```
+
+The ids passed via `samples` and `markers` are attached to the masks as
+dimnames, make them self-describing, and enable the consistency checks of
+`EstimateQuality()`.
+
+```{r}
+dim(masks[[1]])
+sum(masks[[1]])          # hidden genotypes in the first mask
+masks[[1]][1:4, 1:4]
+```
+
+The hidden genotypes can be exported for use outside R:
+
+```{r}
+WriteMaskSet(masks, "masks.tsv")
+head(read.table("masks.tsv", header = TRUE))
+```
+
+`ApplyMasks()` writes one VCF per mask with the hidden genotypes set to
+`./.`:
+
+```{r}
+ApplyMasks(x$haps, masks, pref = "masked", vcf = x$vcf)
+```
+
+Imputation
+----------
+
+In a real analysis you would run BEAGLE on every masked file, for example:
+
+```{r, engine = "bash", eval = FALSE}
+java -jar beagle.jar gt=masked.m1.vcf ref=reference.vcf.gz out=imputed.m1
+java -jar beagle.jar gt=masked.m2.vcf ref=reference.vcf.gz out=imputed.m2
+java -jar beagle.jar gt=masked.m3.vcf ref=reference.vcf.gz out=imputed.m3
+```
+
+**Important.** When imputing with a reference panel, the output contains all
+reference markers, not only yours. Reduce every output back to the markers of
+the original file before scoring, for example with bcftools:
+
+```{r, engine = "bash", eval = FALSE}
+bcftools view -T <(bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\n' beagle.vcf) \
+  -Oz -o imputed.m1.check.vcf.gz imputed.m1.vcf.gz
+```
+
+`EstimateQuality()` checks the dimensions, and, for VCF files, the sample and
+marker ids, so a mis-aligned pair of files is reported instead of silently
+producing nonsense.
+
+Here we cannot run BEAGLE, so we stand in for it with a simulation: the
+imputed file carries the true genotypes back, with a small fraction of the
+hidden genotypes corrupted and one left missing. The essential contract is
+simple — the imputed files must be VCFs (or fastPHASE files) with the same
+samples and markers as the original file, carrying the imputed genotypes.
+
+The files used below were produced by
+`inst/extdata/make_beagle_vignette.R` of the package source, which performs
+exactly this simulation with a 2% error rate on the same masks:
+
+```{r}
+imputed <- system.file("extdata", sprintf("beagle_imputed.m%d.vcf", 1:3),
+                       package = "imputeqc")
+imputed
+```
+
+Quality
+-------
+
+```{r}
+eq <- EstimateQuality(origin = vcf_file, masks = "masks.RDS",
+                      imputed = imputed, id = "beagle")
+eq
+```
+
+The columns are the genotype discordance (the fraction of hidden genotypes
+whose allele pair differs from the truth), the allele discordance, the number
+of hidden genotypes, the number of them the imputer left missing, and the
+ordinal number of the mask.
+
+The discordance is usually strongly dependent on the minor allele frequency.
+Pass `af_bins` to estimate it per stratum of the original data:
+
+```{r}
+eqb <- EstimateQuality(origin = vcf_file, masks = "masks.RDS",
+                       imputed = imputed, id = "beagle",
+                       af_bins = c(0, 0.01, 0.05, 0.1, 0.5))
+eqb
+```
+
+Finally, `PlotDiscordance()` visualises the results of several experiments,
+for example imputations made with different parameters:
+
+```{r, fig.width = 6, fig.height = 4}
+write.table(eqb, "discordance.tsv", sep = "\t", row.names = FALSE)
+p <- PlotDiscordance("discordance.tsv", tl = "BEAGLE imputation")
+print(p)
+```
+
+Session info
+------------
+
+```{r}
+sessionInfo()
+```

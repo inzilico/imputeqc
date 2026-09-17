@@ -10,7 +10,11 @@
 #' a proportion of markers to be masked in chromosome
 #' \emph{GenerateMaskSet} samples a set of different masks.
 #'
-#' The number of masks in a set can vary in both cases.
+#' The number of masks in a set can vary in both cases. The masks within one
+#' set are drawn disjointly: genotypes hidden by earlier masks are never
+#' re-drawn by later ones, so together the masks of a set cover about
+#' \code{n * p} of the available genotypes. Call \code{\link{set.seed}}
+#' beforehand to make the masks reproducible.
 #'
 #' @param g Character vector. The elements are sequences made of alleles.
 #' The length of \emph{g} equals to 2*\emph{N}, where \emph{N} is the number of
@@ -20,15 +24,35 @@
 #' markers to be masked in chromosome
 #' @param type Type of masking. "genotype" for hiding genotypes and "marker" for
 #' hiding the markers. The default is "genotype".
+#' @param samples Optional character vector of length \emph{N} with sample ids.
+#' If given, the ids are attached to the masks as row names.
+#' @param markers Optional character vector of length \emph{M} with marker ids
+#' (e.g. rs numbers). If given, the ids are attached to the masks as column
+#' names. Dimnames make the masks self-describing; they are used by
+#' \code{\link{WriteMaskSet}} and enable the consistency checks in
+#' \code{\link{EstimateQuality}}.
 #'
-#' @return A list of length \emph{n} containing masks as matrices
+#' @return A list of length \emph{n} containing masks as binary (0/1) matrices
+#'   with \emph{N} rows and \emph{M} columns, where 1 marks a hidden genotype.
 #' @export
 #'
-GenerateMaskSet <- function(g, n, p, type = "genotype"){
+GenerateMaskSet <- function(g, n, p, type = "genotype", samples = NULL,
+                            markers = NULL){
 
   # Initilize variables
   M <- nchar(g[1]) # number of markers
   N <- length(g)/2 # number of individuals
+
+  if (!is.null(samples) && length(samples) != N)
+    stop(sprintf("'samples' has length %s, expected N = %s", length(samples), N))
+  if (!is.null(markers) && length(markers) != M)
+    stop(sprintf("'markers' has length %s, expected M = %s", length(markers), M))
+
+  dn <- NULL
+  if (!is.null(samples) || !is.null(markers))
+    dn <- list(if (is.null(samples)) NULL else samples,
+               if (is.null(markers)) NULL else markers)
+
   out <- list()
 
   if (type == "marker") {
@@ -37,13 +61,13 @@ GenerateMaskSet <- function(g, n, p, type = "genotype"){
     snps <- 1:M
     size <- floor(p*M)
     ind <- sample(x = snps, size = size)
-    out[[1]] <- makeMask(N, M, ind)
+    out[[1]] <- makeMask(N, M, ind, dn)
 
     # Make list with other masks
     for (i in 2:n) {
       snps <- snps[!snps %in% ind]
       ind <- sample(x = snps, size = size)
-      out[[i]] <- makeMask(N, M, ind)
+      out[[i]] <- makeMask(N, M, ind, dn)
     }
 
     return(out)
@@ -53,38 +77,40 @@ GenerateMaskSet <- function(g, n, p, type = "genotype"){
 
   # Create a binary matrix with originally missing values
   m0 <- GetMissing(g, M)
+  message("Proportion of originally missing genotype: ",
+          round(sum(m0)/(nrow(m0) * ncol(m0)), 4))
 
   # Count available genotypes per marker
   size <- round((N - colSums(m0)) * p)
 
-  # To keep genotypes that are already masked
+  # Keep genotypes that are already hidden; updated after each mask so that
+  # the masks of one set stay disjoint
   masked <- m0
 
   # Generate diffferent n masks
   for(i in seq_len(n)) {
 
-    # Initiate empty mask
-    m <- matrix(0, ncol = M, nrow = N)
+    message("Generating mask ", i, "...")
 
-    message(sprintf("Generating mask %s...", i))
+    out[[i]] <- GenerateMask(masked, size, dn)
 
-    # Generate new mask
-    out[[i]] <- GenerateMask(m, masked, size)
-
-    # Update genotypes that are alreade masked
-    masked <- Reduce('+', out)
+    # Update genotypes that are already masked
+    masked <- masked + out[[i]]
   }
   return(out)
 }
 
-GenerateMask <- function(m, masked, size){
+GenerateMask <- function(masked, size, dimnames = NULL){
   # Generate a new mask
   # Args:
-  #   m: matrix with zeros
-  #   masked: matrix keeping genotypes previously masked
-  #   size: vector with the number of genotypes available for masking
+  #   masked: matrix keeping genotypes already hidden (originally missing or
+  #     hidden by the previous masks of the set)
+  #   size: vector with the number of genotypes to hide per marker
+  #   dimnames: optional dimnames attached to the output mask
   # Returns:
   #   A new mask as a binary matrix
+
+  m <- matrix(0, ncol = length(size), nrow = nrow(masked))
 
   for (j in seq_len(ncol(m))) {
 
@@ -100,56 +126,32 @@ GenerateMask <- function(m, masked, size){
 
     m[add, j] <- 1
   }
+
+  if (!is.null(dimnames)) dimnames(m) <- dimnames
   m
-}
-
-
-GetMissingMarkers <- function(data){
-  # Determines the positions of missing bases per individual
-  # Args:
-  #   data: character vector of sequnces
-  # Returns:
-  #   List with positions of missed genotypes for each individual
-  mindex <- sapply(data, function(x) unlist(gregexpr("\\?", x)), USE.NAMES = F)
-  mindex[seq(2, length(mindex), 2)]
-}
-
-ToBinary <- function(data, jmax){
-  # Converts list with the positions into binary matrix
-  # Args:
-  #  data: list with the positions
-  #  jmax: number of markers
-  # Returns:
-  #  Binary matrix, where 1 means missing and 0 - nonmissing values.
-  sapply(seq_len(jmax), function(j){
-    sapply(data, function(i) ifelse(j %in% i, 1, 0))
-  })
 }
 
 GetMissing <- function(data, M){
   # Determines missing genotypes
   # Args:
-  #   data: character vector with sequences
+  #   data: character vector with haplotypes (length 2N)
   #   M: number of markers
   # Returns:
-  #   Binary matrix, where 1 corresponds to missing genotype.
+  #   Binary matrix (N x M), where 1 corresponds to missing genotype
 
   message("Counting missing genotypes...")
 
-  # Get list of missing markers per individual
-  tmp <- GetMissingMarkers(data)
+  # Split haplotypes into an allele matrix (2N x M)
+  x <- matrix(unlist(strsplit(data, "", fixed = TRUE), use.names = FALSE),
+              nrow = length(data), byrow = TRUE)
 
-  # Convert list of missing markers into binary matrix
-  m <- ToBinary(tmp, M)
-
-  # Print proportion of missing genotypes
-  p <- sum(colSums(m))/(dim(m)[1] * dim(m)[2])
-  message("Proportion of originally missing genotype: ", round(p, 4))
-
-  m
+  # A genotype is missing when both of its alleles are unknown
+  miss <- (x[seq(1, nrow(x), 2), ] == "?") & (x[seq(2, nrow(x), 2), ] == "?")
+  storage.mode(miss) <- "numeric"
+  miss
 }
 
-makeMask <- function(i, j, x) {
+makeMask <- function(i, j, x, dimnames = NULL) {
   # Crates matrix with 0, where columns x are filled with 1.
   # Args:
   #  i, j: the number of rows and columns
@@ -157,7 +159,7 @@ makeMask <- function(i, j, x) {
   # Returns:
   #  Matrix
   m <- matrix(0L, nrow = i, ncol = j)
-  m[, x] <- 1
+  m[, x] <- 1L
+  if (!is.null(dimnames)) dimnames(m) <- dimnames
   m
 }
-
