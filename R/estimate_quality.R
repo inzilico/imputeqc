@@ -220,6 +220,9 @@ AlignWithOrigin <- function(g0, g1, label) {
   g1
 }
 
+# suppress R CMD check note about the ggplot non-standard evaluation
+utils::globalVariables("discordance")
+
 #' Boxpolt discordance
 #'
 #' Draw boxplots of discordance estimated for different model parameters.

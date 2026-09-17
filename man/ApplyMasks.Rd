@@ -13,7 +13,7 @@ ApplyMasks(g, masks, pref, vcf = NULL)
 
 \item{pref}{path/to/prefix to save the output. The number of files created
 equals to the length of masks variable. The filenames are generated
-automatically like this: \emph{prefix.m{n}.inp}, where \emph{prefix} is a
+automatically like this: \emph{prefix.m\{n\}.inp}, where \emph{prefix} is a
 user defined string, \emph{n} is an ordinal number of the mask.}
 
 \item{vcf}{VCF-class object. If provided, the output will be saved as vcf

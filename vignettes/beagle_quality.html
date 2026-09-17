@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Gennady Khvorykh, inzilico.com" />
+
+<meta name="date" content="2026-09-17" />
+
+<title>Estimating the Quality of BEAGLE Imputation with Masked Data</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Estimating the Quality of BEAGLE Imputation with Masked Data</h1>
+<h4 class="author">Gennady Khvorykh, <a href="http://inzilico.com">inzilico.com</a></h4>
+<h4 class="date">2026-09-17</h4>
+
+
+
+<div id="motivation" class="section level2">
+<h2>Motivation</h2>
+<p>You have genotyped your samples on a SNP array and imputed the missing genotypes with <a href="https://faculty.washington.edu/browning/beagle/beagle.html">BEAGLE</a>. How good is the imputation? The internal metrics printed by BEAGLE (or stored in the INFO field of the output) are estimates. The masked data analysis gives you an empirical answer: hide a small proportion of the known genotypes, impute them as if they were missing, and compare with the truth.</p>
+<p>This vignette walks through the whole workflow with VCF files. BEAGLE itself is not run inside the vignette; instead, the imputation is simulated by copying the true genotypes back with a few errors introduced. Replace the simulation with your real BEAGLE runs when you work with your data — the shell commands are given in place.</p>
+</div>
+<div id="the-data" class="section level2">
+<h2>The data</h2>
+<p>We use a small VCF file with 20 individuals genotyped at 200 SNPs, which ships with the package.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(imputeqc)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>vcf_file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;beagle.vcf&quot;</span>, <span class="at">package =</span> <span class="st">&quot;imputeqc&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">ReadVCF</span>(vcf_file)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Loading /home/gennady/R/user-lib/imputeqc/extdata/beagle.vcf</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Haplotypes: 40</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; SNPs: 200</span></span></code></pre></div>
+<p><code>ReadVCF()</code> returns the VCF object, the haplotypes as strings, and the sample and marker ids read from the file:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(x<span class="sc">$</span>haps)      <span class="co"># 2N haplotypes</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 40</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">nchar</span>(x<span class="sc">$</span>haps[<span class="dv">1</span>])    <span class="co"># of M markers</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 200</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(x<span class="sc">$</span>samples, <span class="dv">3</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ID01&quot; &quot;ID02&quot; &quot;ID03&quot;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(x<span class="sc">$</span>markers, <span class="dv">3</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;rsV001&quot; &quot;rsV002&quot; &quot;rsV003&quot;</span></span></code></pre></div>
+</div>
+<div id="masking" class="section level2">
+<h2>Masking</h2>
+<p>We hide 5% of genotypes at each locus and repeat this three times — with only 20 samples, 1% would round to zero genotypes per locus; on real data 1% is the usual choice. The masks of one set are disjoint: together they hide about 15% of the available genotypes, each hidden exactly once. Call <code>set.seed()</code> beforehand to make the masks reproducible.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>masks <span class="ot">&lt;-</span> <span class="fu">GenerateMaskSet</span>(x<span class="sc">$</span>haps, <span class="at">n =</span> <span class="dv">3</span>, <span class="at">p =</span> <span class="fl">0.05</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">samples =</span> x<span class="sc">$</span>samples, <span class="at">markers =</span> x<span class="sc">$</span>markers)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Hiding of genotypes is choosen</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Counting missing genotypes...</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Proportion of originally missing genotype: 0.002</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Generating mask 1...</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Generating mask 2...</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Generating mask 3...</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(masks, <span class="st">&quot;masks.RDS&quot;</span>)</span></code></pre></div>
+<p>The ids passed via <code>samples</code> and <code>markers</code> are attached to the masks as dimnames, make them self-describing, and enable the consistency checks of <code>EstimateQuality()</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(masks[[<span class="dv">1</span>]])</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1]  20 200</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(masks[[<span class="dv">1</span>]])          <span class="co"># hidden genotypes in the first mask</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 200</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>masks[[<span class="dv">1</span>]][<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      rsV001 rsV002 rsV003 rsV004</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ID01      0      0      1      0</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ID02      0      0      0      0</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ID03      0      0      0      0</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ID04      0      0      0      0</span></span></code></pre></div>
+<p>The hidden genotypes can be exported for use outside R:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">WriteMaskSet</span>(masks, <span class="st">&quot;masks.tsv&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 600 hidden genotypes of 3 masks are written to masks.tsv</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">read.table</span>(<span class="st">&quot;masks.tsv&quot;</span>, <span class="at">header =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   mask sample marker</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1    1   ID17 rsV001</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2    1   ID05 rsV002</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3    1   ID01 rsV003</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4    1   ID10 rsV004</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5    1   ID04 rsV005</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    1   ID18 rsV006</span></span></code></pre></div>
+<p><code>ApplyMasks()</code> writes one VCF per mask with the hidden genotypes set to <code>./.</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ApplyMasks</span>(x<span class="sc">$</span>haps, masks, <span class="at">pref =</span> <span class="st">&quot;masked&quot;</span>, <span class="at">vcf =</span> x<span class="sc">$</span>vcf)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Applying mask 1...</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; File masked.m1.vcf is saved</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Applying mask 2...</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; File masked.m2.vcf is saved</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Applying mask 3...</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; File masked.m3.vcf is saved</span></span></code></pre></div>
+</div>
+<div id="imputation" class="section level2">
+<h2>Imputation</h2>
+<p>In a real analysis you would run BEAGLE on every masked file, for example:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">java</span> -jar beagle.jar gt=masked.m1.vcf ref=reference.vcf.gz out=imputed.m1</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">java</span> -jar beagle.jar gt=masked.m2.vcf ref=reference.vcf.gz out=imputed.m2</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">java</span> -jar beagle.jar gt=masked.m3.vcf ref=reference.vcf.gz out=imputed.m3</span></code></pre></div>
+<p><strong>Important.</strong> When imputing with a reference panel, the output contains all reference markers, not only yours. Reduce every output back to the markers of the original file before scoring, for example with bcftools:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">bcftools</span> view -T <span class="op">&lt;(</span><span class="ex">bcftools</span> query -f <span class="st">&#39;%CHROM\t%POS\t%REF\t%ALT\n&#39;</span> beagle.vcf<span class="op">)</span> <span class="kw">\</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">-Oz</span> -o imputed.m1.check.vcf.gz imputed.m1.vcf.gz</span></code></pre></div>
+<p><code>EstimateQuality()</code> checks the dimensions, and, for VCF files, the sample and marker ids, so a mis-aligned pair of files is reported instead of silently producing nonsense.</p>
+<p>Here we cannot run BEAGLE, so we stand in for it with a simulation: the imputed file carries the true genotypes back, with a small fraction of the hidden genotypes corrupted and one left missing. The essential contract is simple — the imputed files must be VCFs (or fastPHASE files) with the same samples and markers as the original file, carrying the imputed genotypes.</p>
+<p>The files used below were produced by <code>inst/extdata/make_beagle_vignette.R</code> of the package source, which performs exactly this simulation with a 2% error rate on the same masks:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>imputed <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="fu">sprintf</span>(<span class="st">&quot;beagle_imputed.m%d.vcf&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>),</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">package =</span> <span class="st">&quot;imputeqc&quot;</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>imputed</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;/home/gennady/R/user-lib/imputeqc/extdata/beagle_imputed.m1.vcf&quot;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2] &quot;/home/gennady/R/user-lib/imputeqc/extdata/beagle_imputed.m2.vcf&quot;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3] &quot;/home/gennady/R/user-lib/imputeqc/extdata/beagle_imputed.m3.vcf&quot;</span></span></code></pre></div>
+</div>
+<div id="quality" class="section level2">
+<h2>Quality</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>eq <span class="ot">&lt;-</span> <span class="fu">EstimateQuality</span>(<span class="at">origin =</span> vcf_file, <span class="at">masks =</span> <span class="st">&quot;masks.RDS&quot;</span>,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">imputed =</span> imputed, <span class="at">id =</span> <span class="st">&quot;beagle&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Missingness of original data: 0.002</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Discordance: 0.025</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Discordance: 0.025</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Discordance: 0.025</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>eq</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   discordance allele_discordance n_masked n_unfilled mask     id</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1       0.025              0.015      200          1    1 beagle</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2       0.025              0.015      200          1    2 beagle</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3       0.025              0.015      200          1    3 beagle</span></span></code></pre></div>
+<p>The columns are the genotype discordance (the fraction of hidden genotypes whose allele pair differs from the truth), the allele discordance, the number of hidden genotypes, the number of them the imputer left missing, and the ordinal number of the mask.</p>
+<p>The discordance is usually strongly dependent on the minor allele frequency. Pass <code>af_bins</code> to estimate it per stratum of the original data:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>eqb <span class="ot">&lt;-</span> <span class="fu">EstimateQuality</span>(<span class="at">origin =</span> vcf_file, <span class="at">masks =</span> <span class="st">&quot;masks.RDS&quot;</span>,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">imputed =</span> imputed, <span class="at">id =</span> <span class="st">&quot;beagle&quot;</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">af_bins =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span>, <span class="fl">0.1</span>, <span class="fl">0.5</span>))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Missingness of original data: 0.002</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Discordance: 0.025</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Discordance: 0.025</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Discordance: 0.025</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>eqb</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    discordance allele_discordance n_masked n_unfilled mask      af_bin     id</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     0.025000           0.015000      200          1    1         ALL beagle</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     0.000000           0.000000        8          0    1    [0,0.01] beagle</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     0.133333           0.100000       15          1    1 (0.01,0.05] beagle</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     0.000000           0.000000       24          0    1  (0.05,0.1] beagle</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     0.019608           0.009804      153          0    1   (0.1,0.5] beagle</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     0.025000           0.015000      200          1    2         ALL beagle</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7     0.000000           0.000000        8          0    2    [0,0.01] beagle</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8     0.066667           0.066667       15          1    2 (0.01,0.05] beagle</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9     0.000000           0.000000       24          0    2  (0.05,0.1] beagle</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10    0.026144           0.013072      153          0    2   (0.1,0.5] beagle</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11    0.025000           0.015000      200          1    3         ALL beagle</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12    0.000000           0.000000        8          0    3    [0,0.01] beagle</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13    0.066667           0.066667       15          1    3 (0.01,0.05] beagle</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14    0.041667           0.020833       24          0    3  (0.05,0.1] beagle</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15    0.019608           0.009804      153          0    3   (0.1,0.5] beagle</span></span></code></pre></div>
+<p>Finally, <code>PlotDiscordance()</code> visualises the results of several experiments, for example imputations made with different parameters:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.table</span>(eqb, <span class="st">&quot;discordance.tsv&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">PlotDiscordance</span>(<span class="st">&quot;discordance.tsv&quot;</span>, <span class="at">tl =</span> <span class="st">&quot;BEAGLE imputation&quot;</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="session-info" class="section level2">
+<h2>Session info</h2>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; R version 4.6.1 (2026-06-24)</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Running under: Ubuntu 22.04.5 LTS</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Matrix products: default</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.10.0 </span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.10.0  LAPACK version 3.10.0</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; locale:</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              </span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [3] LC_TIME=en_GB.UTF-8        LC_COLLATE=en_US.UTF-8    </span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_US.UTF-8   </span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                 </span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [9] LC_ADDRESS=C               LC_TELEPHONE=C            </span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       </span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; time zone: Europe/Moscow</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; tzcode source: system (glibc)</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; attached base packages:</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; other attached packages:</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] imputeqc_1.1.0</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1] KEGGREST_1.52.2             SummarizedExperiment_1.42.0</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [3] gtable_0.3.6                rjson_0.2.23               </span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [5] xfun_0.61                   bslib_0.12.0               </span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [7] ggplot2_4.0.3               Biobase_2.72.0             </span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [9] lattice_0.23-1              vctrs_0.7.3                </span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [11] tools_4.6.1                 bitops_1.1-0               </span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [13] generics_0.1.4              stats4_4.6.1               </span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [15] curl_8.0.0                  parallel_4.6.1             </span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [17] AnnotationDbi_1.74.0        RSQLite_3.53.3             </span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [19] blob_1.3.0                  Matrix_1.7-6               </span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [21] BSgenome_1.80.0             RColorBrewer_1.1-3         </span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [23] cigarillo_1.2.1             S7_0.2.2                   </span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [25] S4Vectors_0.50.2            lifecycle_1.0.5            </span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [27] compiler_4.6.1              farver_2.1.2               </span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [29] Rsamtools_2.28.0            Biostrings_2.80.2          </span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [31] Seqinfo_1.2.0               codetools_0.2-19           </span></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [33] htmltools_0.5.9             sass_0.4.10                </span></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [35] RCurl_1.98-1.20             yaml_2.3.12                </span></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [37] crayon_1.5.3                jquerylib_0.1.4            </span></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [39] BiocParallel_1.46.0         DelayedArray_0.38.2        </span></span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [41] cachem_1.1.0                abind_1.4-8                </span></span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [43] digest_0.6.39               restfulr_0.0.17            </span></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [45] VariantAnnotation_1.58.0    labeling_0.4.3             </span></span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [47] fastmap_1.2.0               grid_4.6.1                 </span></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [49] cli_3.6.6                   SparseArray_1.12.2         </span></span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [51] S4Arrays_1.12.0             GenomicFeatures_1.64.0     </span></span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [53] XML_3.99-0.24               withr_3.0.3                </span></span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [55] scales_1.4.0                bit64_4.8.6                </span></span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [57] rmarkdown_2.32              XVector_0.52.0             </span></span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [59] httr_1.4.9                  matrixStats_1.5.0          </span></span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [61] bit_4.6.0                   png_0.1-9                  </span></span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [63] memoise_2.0.1               evaluate_1.0.5             </span></span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [65] knitr_1.52                  GenomicRanges_1.64.0       </span></span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [67] IRanges_2.46.0              BiocIO_1.22.0              </span></span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [69] rtracklayer_1.72.0          rlang_1.3.0                </span></span>
+<span id="cb13-63"><a href="#cb13-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [71] glue_1.8.1                  DBI_1.3.0                  </span></span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [73] BiocGenerics_0.58.1         jsonlite_2.0.0             </span></span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [75] R6_2.6.1                    GenomicAlignments_1.48.0   </span></span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [77] MatrixGenerics_1.24.0</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
